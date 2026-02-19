@@ -1,6 +1,11 @@
 import NodeCache from 'node-cache';
 
-const cache = new NodeCache({ stdTTL: 300, checkperiod: 60 });
+export const CACHE_TTL = Object.freeze({
+  DEFAULT: 300,
+  IETT_SOAP: 90,
+});
+
+const cache = new NodeCache({ stdTTL: CACHE_TTL.DEFAULT, checkperiod: 60 });
 
 export function getCached(key) {
   return cache.get(key) || null;

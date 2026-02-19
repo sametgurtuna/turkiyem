@@ -101,3 +101,37 @@ export function createRouteTable(route) {
 
   return table.toString();
 }
+
+function formatTimes(times, limit = 30) {
+  if (!Array.isArray(times) || times.length === 0) return '-';
+  if (times.length <= limit) return times.join(', ');
+
+  const visible = times.slice(0, limit).join(', ');
+  const remaining = times.length - limit;
+  return `${visible}, ... (+${remaining})`;
+}
+
+export function createIettPlannedTimesTable(plannedTimes) {
+  const table = new Table({
+    head: [
+      chalk.white.bold('Gün Tipi'),
+      chalk.white.bold('Yön'),
+      chalk.white.bold('Kalkış Saatleri'),
+      chalk.white.bold('Servis Tipi'),
+    ],
+    colWidths: [14, 12, 70, 18],
+    style: { head: [], border: ['gray'] },
+    wordWrap: true,
+  });
+
+  for (const group of plannedTimes.groups || []) {
+    table.push([
+      group.gunTipi || '-',
+      group.yon || '-',
+      formatTimes(group.saatler, 30),
+      (group.servisTipleri || []).join(', ') || '-',
+    ]);
+  }
+
+  return table.toString();
+}

@@ -2,7 +2,7 @@
 
 Turkiye Toplu Tasima ve Deprem CLI araci.
 
-AFAD deprem verileri, EGO (Ankara) otobus saatleri ve IETT (Istanbul) GTFS hat bilgilerini terminalden sorgulayabilirsiniz.
+AFAD deprem verileri, EGO (Ankara) otobus saatleri ve IETT (Istanbul) hat/saat bilgilerini terminalden sorgulayabilirsiniz.
 
 ## Kurulum
 
@@ -56,7 +56,13 @@ turkiyem hat 34AS
 ```
 
 Ankara icin EGO web sitesinden sefer saatleri cekilir.
-Istanbul icin IETT GTFS verilerinden hat bilgileri (durak sayisi, ilk/son durak) gosterilir.
+Istanbul icin once IETT SOAP Planlanan Sefer Saati servisi ile kalkis saatleri getirilir.
+SOAP servisi gecici olarak erisilemezse otomatik olarak GTFS ozet verisine dusulur.
+
+Istanbul cikti sirasi:
+- Hat bilgileri (GTFS)
+- Planlanan sefer saatleri (SOAP)
+- SOAP hatasinda: yalnizca GTFS ozet + uyari
 
 ### Deprem Sorgulama
 
@@ -100,6 +106,7 @@ Secili sehir `~/.turkiyem/config.json` dosyasinda saklanir. Bu dosya otomatik ol
 | AFAD | Deprem verileri (deprem.afad.gov.tr) |
 | EGO | Ankara otobus sefer saatleri (ego.gov.tr) |
 | IETT | Istanbul GTFS hat verileri (data.ibb.gov.tr) |
+| IETT SOAP | Planlanan sefer saatleri (api.ibb.gov.tr) |
 
 ## npm Publish
 

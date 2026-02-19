@@ -2,8 +2,13 @@ import chalk from 'chalk';
 import ora from 'ora';
 import { getCity } from '../utils/config.js';
 import { fetchEgoSchedule } from '../services/egoService.js';
-import { fetchIettRoute } from '../services/iettService.js';
-import { createEgoInfoTable, createEgoScheduleTable, createRouteTable } from '../utils/display.js';
+import { fetchIettRouteWithPlannedTimes } from '../services/iettService.js';
+import {
+  createEgoInfoTable,
+  createEgoScheduleTable,
+  createIettPlannedTimesTable,
+  createRouteTable,
+} from '../utils/display.js';
 
 export async function hatSorgula(hatNo) {
   if (!hatNo) {
@@ -54,16 +59,29 @@ async function queryEgo(hatNo) {
 }
 
 async function queryIett(hatNo) {
-  const spinner = ora(`IETT hat ${hatNo} bilgileri alınıyor (GTFS verileri indiriliyor)...`).start();
+  const spinner = ora(`IETT hat ${hatNo} bilgileri alınıyor...`).start();
 
   try {
-    const route = await fetchIettRoute(hatNo);
+    const result = await fetchIettRouteWithPlannedTimes(hatNo);
 
     spinner.succeed(`Hat ${hatNo} bilgileri alındı`);
     console.log('');
 
     console.log(chalk.white.bold('  Hat Bilgileri (IETT)'));
-    console.log(createRouteTable(route));
+    console.log(createRouteTable(result.routeSummary));
+
+    if (result.sourceStatus.soap && result.plannedTimes && result.plannedTimes.groups.length > 0) {
+      console.log('');
+      console.log(chalk.white.bold('  Planlanan Sefer Saatleri (IETT SOAP)'));
+      console.log(createIettPlannedTimesTable(result.plannedTimes));
+    } else if (result.sourceStatus.soap) {
+      console.log('');
+      console.log(chalk.yellow('  Planlanan sefer saati verisi boş döndü.'));
+    } else {
+      console.log('');
+      console.log(chalk.yellow('  IETT SOAP servisi kullanılamadı, GTFS özeti gösteriliyor.'));
+      console.log(chalk.gray(`  Detay: ${result.sourceStatus.soapError}`));
+    }
   } catch (err) {
     spinner.fail(chalk.red(err.message));
   }
