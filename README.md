@@ -1,17 +1,57 @@
 # turkiyem
 
-Turkiye Toplu Tasima ve Deprem CLI araci.
+Türkiye için modern, terminal tabanlı bir **toplu taşıma + deprem + hava durumu** CLI aracı.
 
-AFAD deprem verileri, EGO (Ankara) otobus saatleri ve IETT (Istanbul) hat/saat bilgilerini terminalden sorgulayabilirsiniz.
-Open-Meteo ile API key gerektirmeden guncel hava, saatlik tahmin ve hava kalitesi sorgulayabilirsiniz.
+`turkiyem`; AFAD deprem verileri, EGO (Ankara) hat saatleri, IETT (İstanbul) hat bilgileri / planlanan sefer saatleri / canlı konum akışları ve Open-Meteo hava verilerini tek komutta toplar.
+
+## İçindekiler
+
+- [Özellikler](#özellikler)
+- [Kurulum](#kurulum)
+- [Hızlı Başlangıç](#hızlı-başlangıç)
+- [Komut Referansı](#komut-referansı)
+- [Veri Kaynakları](#veri-kaynakları)
+- [Mimari ve Proje Yapısı](#mimari-ve-proje-yapısı)
+- [Yapılandırma ve Cache](#yapılandırma-ve-cache)
+- [Hata Yönetimi](#hata-yönetimi)
+- [Geliştirme](#geliştirme)
+- [Yayınlama (npm)](#yayınlama-npm)
+- [Sık Karşılaşılan Sorunlar](#sık-karşılaşılan-sorunlar)
+- [Lisans](#lisans)
+
+## Özellikler
+
+- **Deprem (AFAD):**
+  - Son 24 saat / son 7 gün deprem listesi
+  - Büyüklüğe göre filtreleme
+  - `>= 4.0` depremler için renkli vurgu
+- **Toplu taşıma (Ankara / EGO):**
+  - Hat bilgileri
+  - Gün tipine göre sefer saatleri (Hafta içi / Cumartesi / Pazar)
+- **Toplu taşıma (İstanbul / IETT):**
+  - GTFS tabanlı hat özeti
+  - SOAP tabanlı planlanan sefer saatleri
+  - SOAP başarısız olduğunda GTFS özete otomatik fallback
+  - `hat canli` ile canlı araç konumu (servis erişimine bağlı)
+- **Hava durumu (Open-Meteo):**
+  - API key gerektirmeden güncel hava
+  - Saatlik tahmin (1-7 gün)
+  - Hava kalitesi (PM10, PM2.5, CO, NO2)
+- **CLI UX:**
+  - Komut bazlı spinner
+  - Tablo tabanlı okunabilir terminal çıktısı
+  - Global şehir ayarı (`~/.turkiyem/config.json`)
+  - Bellek içi cache ile performans optimizasyonu
 
 ## Kurulum
+
+### Global (önerilen)
 
 ```bash
 npm install -g turkiyem
 ```
 
-Veya yerel olarak:
+### Yerel geliştirme
 
 ```bash
 git clone <repo-url>
@@ -20,155 +60,184 @@ npm install
 npm link
 ```
 
-## Gereksinimler
+### Gereksinim
 
-- Node.js 20+
+- Node.js `20+`
 
-## Kullanim
+## Hızlı Başlangıç
 
-### Banner ve Yardim
+```bash
+turkiyem
+turkiyem sehir istanbul
+turkiyem hat 34AS
+turkiyem deprem son24
+turkiyem hava guncel
+```
+
+## Komut Referansı
+
+### Genel
 
 ```bash
 turkiyem
 turkiyem help
+turkiyem --version
+turkiyem temizle
 ```
 
-### Sehir Secimi
-
-Hat sorgulama icin once sehir secmelisiniz:
+### Şehir seçimi
 
 ```bash
 turkiyem sehir ankara
 turkiyem sehir istanbul
 ```
 
-### Hat Sorgulama
+> `hat` komutları seçili şehre göre çalışır.
 
-Secili sehre gore hat bilgilerini sorgular:
+### Hat sorgulama
 
 ```bash
 # Ankara (EGO)
 turkiyem sehir ankara
 turkiyem hat 340
 
-# Istanbul (IETT)
+# İstanbul (IETT)
 turkiyem sehir istanbul
 turkiyem hat 34AS
+```
 
-# IETT canli arac konumu (ozet)
+İstanbul akışı:
+- 1) GTFS hat özeti
+- 2) SOAP planlanan sefer saatleri
+- 3) SOAP erişilemezse GTFS özeti + bilgilendirme mesajı
+
+### IETT canlı konum
+
+```bash
+# Özet çıktı
 turkiyem hat canli 34AS
 
-# IETT canli arac konumu (detay)
+# Detay çıktı
 turkiyem hat canli 34AS --detay
 ```
 
-Ankara icin EGO web sitesinden sefer saatleri cekilir.
-Istanbul icin once IETT SOAP Planlanan Sefer Saati servisi ile kalkis saatleri getirilir.
-SOAP servisi gecici olarak erisilemezse otomatik olarak GTFS ozet verisine dusulur.
+> Not: Canlı konum sadece `istanbul` şehir seçiliyken anlamlıdır ve servis erişimine bağlıdır.
 
-Istanbul cikti sirasi:
-- Hat bilgileri (GTFS)
-- Planlanan sefer saatleri (SOAP)
-- SOAP hatasinda: yalnizca GTFS ozet + uyari
-
-Canli konum ozelligi:
-- `turkiyem hat canli <numara>` varsayilan olarak ozet verir
-- `--detay` ile arac bazli konum tablosu acilir
-- Sadece `istanbul` seciliyken kullanilir
-
-### Deprem Sorgulama
-
-AFAD API uzerinden gercek zamanli deprem verileri:
+### Deprem (AFAD)
 
 ```bash
-# Son 24 saat
 turkiyem deprem son24
-
-# Son 7 gun
 turkiyem deprem 7gun
-
-# Buyukluge gore filtrele (ornegin >= 4.0)
 turkiyem deprem buyukluk 4.0
 ```
 
-Buyuklugu 4.0 ve ustu olan depremler kirmizi ile vurgulanir.
-
-### Hava Durumu ve Hava Kalitesi
-
-Open-Meteo uzerinden API key gerektirmeden sorgu yapar:
+### Hava durumu ve hava kalitesi (Open-Meteo)
 
 ```bash
-# Secili sehir icin guncel hava
+# Seçili şehir
 turkiyem hava guncel
 
-# Sehir bazli guncel hava
+# Şehir adıyla
 turkiyem hava guncel istanbul
+turkiyem hava saatlik ankara --gun 3
+turkiyem hava kalite izmir
 
-# Koordinat bazli guncel hava
+# Koordinatla
 turkiyem hava guncel 41.0082,28.9784
-
-# Saatlik tahmin (varsayilan 2 gun)
-turkiyem hava saatlik istanbul
-
-# Saatlik tahmin gun sayisi (1-7)
-turkiyem hava saatlik istanbul --gun 3
-
-# Hava kalitesi
-turkiyem hava kalite ankara
 ```
 
-### Temizleme
+## Veri Kaynakları
 
-Cache ve yapilandirmayi sifirlar:
+| Kaynak | Kullanım |
+|---|---|
+| AFAD | Deprem verileri |
+| EGO | Ankara hat/sefer saatleri |
+| IETT GTFS | İstanbul hat özeti |
+| IETT SOAP (PlanlananSeferSaati) | İstanbul planlanan sefer saatleri |
+| IETT SOAP (SeferGerceklesme) | İstanbul canlı araç konumu |
+| Open-Meteo Forecast | Güncel hava + saatlik tahmin |
+| Open-Meteo Air Quality | Hava kalitesi |
+
+## Mimari ve Proje Yapısı
+
+```text
+src/
+  commands/   # CLI komut handler'ları
+  services/   # Dış API / scraping / SOAP katmanı
+  utils/      # Tablo, cache, config, banner yardımcıları
+  index.js    # Commander giriş noktası
+```
+
+Mimari prensipleri:
+- Komut katmanı ile servis katmanı ayrımı
+- API bağımlılıklarının servis içinde izole edilmesi
+- Tekrarlanan işlerin util katmanına alınması
+- Tüm dış isteklerde timeout + anlamlı hata mesajı
+
+## Yapılandırma ve Cache
+
+- Seçili şehir dosyası:
+  - `~/.turkiyem/config.json`
+- Varsayılan cache:
+  - Bellek içi (`node-cache`)
+  - Kaynak bazlı TTL (ör. IETT SOAP, hava durumu vb.)
+
+Temizleme:
 
 ```bash
 turkiyem temizle
 ```
 
-### Versiyon
+## Hata Yönetimi
+
+Projede:
+- `unhandledRejection` ve `uncaughtException` yakalanır
+- API hataları kullanıcı dostu mesajlara çevrilir
+- Ağ timeout / bağlantı sorunları için özel açıklamalar verilir
+- Erişilemeyen kaynaklarda mümkün olan yerlerde fallback uygulanır
+
+## Geliştirme
 
 ```bash
-turkiyem --version
+npm install
+npm start
 ```
 
-## Yapilandirma
-
-Secili sehir `~/.turkiyem/config.json` dosyasinda saklanir. Bu dosya otomatik olusturulur.
-
-## Veri Kaynaklari
-
-| Kaynak | Aciklama |
-|--------|----------|
-| AFAD | Deprem verileri (deprem.afad.gov.tr) |
-| EGO | Ankara otobus sefer saatleri (ego.gov.tr) |
-| IETT | Istanbul GTFS hat verileri (data.ibb.gov.tr) |
-| IETT SOAP | Planlanan sefer saatleri (api.ibb.gov.tr) |
-| IETT Live SOAP | Hat bazli canli arac konumu (api.ibb.gov.tr) |
-| Open-Meteo | Guncel hava ve saatlik tahmin (api.open-meteo.com) |
-| Open-Meteo AQ | Hava kalitesi (air-quality-api.open-meteo.com) |
-
-## npm Publish
-
-1. npm hesabiniza giris yapin:
+Örnek geliştirme doğrulama komutları:
 
 ```bash
-npm login
+node src/index.js help
+node src/index.js deprem son24
+node src/index.js hava guncel istanbul
+node src/index.js hat 34AS
 ```
 
-2. package.json icindeki `name`, `version`, `author` alanlarini duzenleyin.
-
-3. Yayinlayin:
+## Yayınlama (npm)
 
 ```bash
-npm publish
-```
-
-4. Guncelleme icin versiyonu artirin:
-
-```bash
+# 1) sürüm artır
 npm version patch
-npm publish
+
+# 2) publish
+npm publish --access public
+
+# 3) kontrol
+npm view turkiyem version
 ```
+
+## Sık Karşılaşılan Sorunlar
+
+### `npm publish` 403 (aynı sürüm)
+Önceden yayınlanmış bir sürüm numarasını tekrar gönderemezsiniz.  
+Çözüm: `npm version patch|minor|major` sonrası tekrar publish.
+
+### `npm publish` 403 (2FA / token)
+NPM hesabınız için 2FA veya granular token gereksinimi olabilir.  
+Çözüm: NPM hesabında token/2FA ayarlarını tamamlayın.
+
+### IETT canlı konum 500
+SOAP servis tarafı geçici olarak hata döndürebilir.  
+Bu durumda kısa süre sonra tekrar deneyin.
 
 ## Lisans
 
