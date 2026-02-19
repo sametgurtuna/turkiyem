@@ -54,6 +54,12 @@ turkiyem hat 340
 # Istanbul (IETT)
 turkiyem sehir istanbul
 turkiyem hat 34AS
+
+# IETT canli arac konumu (ozet)
+turkiyem hat canli 34AS
+
+# IETT canli arac konumu (detay)
+turkiyem hat canli 34AS --detay
 ```
 
 Ankara icin EGO web sitesinden sefer saatleri cekilir.
@@ -64,6 +70,11 @@ Istanbul cikti sirasi:
 - Hat bilgileri (GTFS)
 - Planlanan sefer saatleri (SOAP)
 - SOAP hatasinda: yalnizca GTFS ozet + uyari
+
+Canli konum ozelligi:
+- `turkiyem hat canli <numara>` varsayilan olarak ozet verir
+- `--detay` ile arac bazli konum tablosu acilir
+- Sadece `istanbul` seciliyken kullanilir
 
 ### Deprem Sorgulama
 
@@ -132,6 +143,7 @@ Secili sehir `~/.turkiyem/config.json` dosyasinda saklanir. Bu dosya otomatik ol
 | EGO | Ankara otobus sefer saatleri (ego.gov.tr) |
 | IETT | Istanbul GTFS hat verileri (data.ibb.gov.tr) |
 | IETT SOAP | Planlanan sefer saatleri (api.ibb.gov.tr) |
+| IETT Live SOAP | Hat bazli canli arac konumu (api.ibb.gov.tr) |
 | Open-Meteo | Guncel hava ve saatlik tahmin (api.open-meteo.com) |
 | Open-Meteo AQ | Hava kalitesi (air-quality-api.open-meteo.com) |
 

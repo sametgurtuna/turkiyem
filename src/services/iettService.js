@@ -5,6 +5,8 @@ const DATASTORE_SQL_URL = 'https://data.ibb.gov.tr/api/3/action/datastore_search
 const DATASTORE_SEARCH_URL = 'https://data.ibb.gov.tr/api/3/action/datastore_search';
 const PLANNED_TIME_SOAP_URL = 'https://api.ibb.gov.tr/iett/UlasimAnaVeri/PlanlananSeferSaati.asmx';
 const PLANNED_TIME_SOAP_ACTION = 'http://tempuri.org/GetPlanlananSeferSaati_json';
+const LIVE_SOAP_URL = 'https://api.ibb.gov.tr/iett/FiloDurum/SeferGerceklesme.asmx';
+const LIVE_SOAP_ACTION = 'http://tempuri.org/GetHatOtoKonum_json';
 
 const RESOURCE_IDS = {
   routes: '46dbe388-c8c2-45c4-ac72-c06953de56a2',
@@ -170,6 +172,79 @@ function extractSoapResultJson(xmlText) {
   return JSON.parse(jsonText);
 }
 
+function buildLiveSoapBody(routeCode) {
+  return `<?xml version="1.0" encoding="utf-8"?>
+<soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+               xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+               xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+  <soap:Body>
+    <GetHatOtoKonum_json xmlns="http://tempuri.org/">
+      <HatNo>${routeCode}</HatNo>
+    </GetHatOtoKonum_json>
+  </soap:Body>
+</soap:Envelope>`;
+}
+
+function extractLiveSoapResultJson(xmlText) {
+  const match = xmlText.match(
+    /<GetHatOtoKonum_jsonResult>([\s\S]*?)<\/GetHatOtoKonum_jsonResult>/i,
+  );
+
+  if (!match || !match[1]) return [];
+  const jsonText = match[1].trim();
+  if (!jsonText || jsonText === '[]') return [];
+  return JSON.parse(jsonText);
+}
+
+function normalizeLiveVehicles(records) {
+  return records.map((item) => ({
+    vehicleDoorNo: item.kapino || '-',
+    longitude: item.boylam || '-',
+    latitude: item.enlem || '-',
+    routeCode: item.hatkodu || '-',
+    routeVariantCode: item.guzergahkodu || '-',
+    routeName: item.hatad || '-',
+    direction: item.yon || '-',
+    lastLocationTime: item.son_konum_zamani || '-',
+    nearestStopCode: item.yakinDurakKodu || '-',
+  }));
+}
+
+function parseDateValue(value) {
+  if (!value || value === '-') return Number.NaN;
+  const normalized = value.includes('T') ? value : value.replace(' ', 'T');
+  const ts = new Date(normalized).getTime();
+  return Number.isNaN(ts) ? Number.NaN : ts;
+}
+
+function buildLiveSummary(vehicles) {
+  const directionCounter = new Map();
+  let latestTime = '-';
+  let latestTs = Number.NEGATIVE_INFINITY;
+
+  for (const vehicle of vehicles) {
+    const direction = vehicle.direction || '-';
+    directionCounter.set(direction, (directionCounter.get(direction) || 0) + 1);
+
+    const ts = parseDateValue(vehicle.lastLocationTime);
+    if (!Number.isNaN(ts) && ts > latestTs) {
+      latestTs = ts;
+      latestTime = vehicle.lastLocationTime;
+    }
+  }
+
+  const directionDistribution = Array.from(directionCounter.entries()).map(([direction, count]) => ({
+    direction,
+    count,
+  }));
+
+  return {
+    totalVehicles: vehicles.length,
+    latestLocationTime: latestTime,
+    directionDistribution,
+  };
+}
+
 export async function fetchIettPlannedTimes(routeCode) {
   const code = routeCode.toUpperCase();
   const cacheKey = `iett_soap_times_${code}`;
@@ -315,5 +390,66 @@ export async function fetchIettRouteWithPlannedTimes(routeCode) {
         soapError: err.message || 'IETT SOAP servisi kullanılamadı.',
       },
     };
+  }
+}
+
+export async function fetchIettLiveVehicles(routeCode) {
+  const code = routeCode.toUpperCase();
+  const cacheKey = `iett_live_${code}`;
+  const cached = getCached(cacheKey);
+  if (cached) return cached;
+
+  const body = buildLiveSoapBody(code);
+
+  try {
+    const response = await axios.post(LIVE_SOAP_URL, body, {
+      timeout: 15000,
+      headers: {
+        'Content-Type': 'text/xml; charset=utf-8',
+        SOAPAction: LIVE_SOAP_ACTION,
+        ...API_HEADERS,
+      },
+      responseType: 'text',
+      maxRedirects: 5,
+      validateStatus: (status) => status >= 200 && status < 600,
+    });
+
+    if (response.status === 403) {
+      throw new Error('IETT canlı konum servisi erişimi engellendi (403).');
+    }
+    if (response.status >= 500) {
+      throw new Error(`IETT canlı konum servisi şu anda erişilemiyor (HTTP ${response.status}).`);
+    }
+    if (response.status !== 200) {
+      throw new Error(`IETT canlı konum servisi HTTP ${response.status} döndürdü.`);
+    }
+
+    const parsed = extractLiveSoapResultJson(response.data);
+    const vehicles = normalizeLiveVehicles(parsed);
+
+    if (vehicles.length === 0) {
+      throw new Error(`"${routeCode}" hattı için aktif araç konumu bulunamadı.`);
+    }
+
+    const summary = buildLiveSummary(vehicles);
+    const result = {
+      routeCode: code,
+      summary,
+      vehicles,
+    };
+
+    setCached(cacheKey, result, CACHE_TTL.IETT_LIVE);
+    return result;
+  } catch (err) {
+    if (err.code === 'ECONNABORTED') {
+      throw new Error('IETT canlı konum servisi zaman aşımına uğradı.');
+    }
+    if (err.code === 'ENOTFOUND' || err.code === 'ECONNREFUSED') {
+      throw new Error('IETT canlı konum servisine bağlanılamadı.');
+    }
+    if (err instanceof SyntaxError) {
+      throw new Error('IETT canlı konum yanıtı çözümlenemedi.');
+    }
+    throw err;
   }
 }

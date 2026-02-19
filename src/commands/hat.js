@@ -2,9 +2,11 @@ import chalk from 'chalk';
 import ora from 'ora';
 import { getCity } from '../utils/config.js';
 import { fetchEgoSchedule } from '../services/egoService.js';
-import { fetchIettRouteWithPlannedTimes } from '../services/iettService.js';
+import { fetchIettLiveVehicles, fetchIettRouteWithPlannedTimes } from '../services/iettService.js';
 import {
   createEgoInfoTable,
+  createIettLiveDetailTable,
+  createIettLiveSummaryTable,
   createEgoScheduleTable,
   createIettPlannedTimesTable,
   createRouteTable,
@@ -31,6 +33,48 @@ export async function hatSorgula(hatNo) {
     await queryIett(hatNo);
   } else {
     console.log(chalk.red(`Desteklenmeyen şehir: ${city}. ankara veya istanbul seçin.`));
+  }
+}
+
+export async function hatCanliSorgula(hatNo, options = {}) {
+  if (!hatNo) {
+    console.log(chalk.red('Hat numarası belirtmelisiniz. Örnek: turkiyem hat canli 34AS'));
+    return;
+  }
+
+  const city = getCity();
+  if (!city) {
+    console.log(chalk.yellow('Henüz şehir seçmediniz. Önce şehir seçin:'));
+    console.log(chalk.cyan('  turkiyem sehir istanbul'));
+    return;
+  }
+
+  if (city !== 'istanbul') {
+    console.log(chalk.yellow('Canlı konum özelliği sadece İstanbul (IETT) için kullanılabilir.'));
+    console.log(chalk.gray('Önce şehir seçimini istanbul yapın: turkiyem sehir istanbul'));
+    return;
+  }
+
+  const spinner = ora(`IETT canlı araç konumları alınıyor (${hatNo})...`).start();
+
+  try {
+    const liveData = await fetchIettLiveVehicles(hatNo);
+    spinner.succeed(`IETT canlı konum verisi alındı (${liveData.summary.totalVehicles} araç)`);
+    console.log('');
+
+    console.log(chalk.white.bold('  IETT Canlı Konum Özeti'));
+    console.log(createIettLiveSummaryTable(liveData));
+
+    if (options.detay) {
+      console.log('');
+      console.log(chalk.white.bold('  IETT Canlı Konum Detayları'));
+      console.log(createIettLiveDetailTable(liveData));
+    } else {
+      console.log('');
+      console.log(chalk.gray('  Detay tablo için: turkiyem hat canli <numara> --detay'));
+    }
+  } catch (err) {
+    spinner.fail(chalk.red(err.message));
   }
 }
 

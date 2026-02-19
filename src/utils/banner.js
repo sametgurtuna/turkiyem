@@ -22,6 +22,7 @@ export function printHelp() {
   console.log(chalk.white.bold('  Komutlar:\n'));
   console.log(chalk.cyan('    turkiyem sehir <ankara|istanbul>') + chalk.gray('  Şehir seç'));
   console.log(chalk.cyan('    turkiyem hat <numara>') + chalk.gray('             Hat sorgula'));
+  console.log(chalk.cyan('    turkiyem hat canli <numara> [--detay]') + chalk.gray('  IETT canlı konum'));
   console.log(chalk.cyan('    turkiyem hava guncel [sehir|lat,lon]') + chalk.gray('  Güncel hava'));
   console.log(chalk.cyan('    turkiyem hava saatlik [sehir|lat,lon] -g 2') + chalk.gray('  Saatlik tahmin'));
   console.log(chalk.cyan('    turkiyem hava kalite [sehir|lat,lon]') + chalk.gray('  Hava kalitesi'));

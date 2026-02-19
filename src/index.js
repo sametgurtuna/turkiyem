@@ -5,7 +5,7 @@ import { Command } from 'commander';
 import { createRequire } from 'node:module';
 import { printBanner, printHelp } from './utils/banner.js';
 import { sehirSec } from './commands/sehir.js';
-import { hatSorgula } from './commands/hat.js';
+import { hatCanliSorgula, hatSorgula } from './commands/hat.js';
 import { depremSon24, deprem7Gun, depremBuyukluk } from './commands/deprem.js';
 import { havaGuncel, havaKalitesi, havaSaatlik } from './commands/hava.js';
 import { temizle } from './commands/temizle.js';
@@ -39,11 +39,20 @@ program
     sehirSec(sehir);
   });
 
-program
-  .command('hat <numara>')
-  .description('Hat bilgilerini sorgula')
-  .action(async (numara) => {
-    await hatSorgula(numara);
+const hatCmd = program
+  .command('hat')
+  .description('Hat bilgilerini sorgula');
+
+hatCmd
+  .argument('[arg1]', 'Hat numarası veya "canli"')
+  .argument('[arg2]', 'Canlı komutu için hat numarası')
+  .option('--detay', 'Araç bazlı detay tabloyu göster')
+  .action(async (arg1, arg2, options) => {
+    if (arg1 === 'canli') {
+      await hatCanliSorgula(arg2, options);
+      return;
+    }
+    await hatSorgula(arg1);
   });
 
 const depremCmd = program

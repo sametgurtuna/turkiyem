@@ -198,3 +198,52 @@ export function createAirQualityTable(result) {
 
   return table.toString();
 }
+
+export function createIettLiveSummaryTable(liveData) {
+  const table = new Table({
+    style: { head: [], border: ['gray'] },
+    wordWrap: true,
+  });
+
+  const directionText = (liveData.summary?.directionDistribution || [])
+    .map((item) => `${item.direction}: ${item.count}`)
+    .join(' | ');
+
+  table.push(
+    { [chalk.cyan('Hat Kodu')]: liveData.routeCode || '-' },
+    { [chalk.cyan('Aktif Araç Sayısı')]: String(liveData.summary?.totalVehicles ?? 0) },
+    { [chalk.cyan('Yön Dağılımı')]: directionText || '-' },
+    { [chalk.cyan('Son Konum Zamanı')]: liveData.summary?.latestLocationTime || '-' },
+  );
+
+  return table.toString();
+}
+
+export function createIettLiveDetailTable(liveData) {
+  const table = new Table({
+    head: [
+      chalk.white.bold('Kapı No'),
+      chalk.white.bold('Yön'),
+      chalk.white.bold('Enlem'),
+      chalk.white.bold('Boylam'),
+      chalk.white.bold('Yakın Durak'),
+      chalk.white.bold('Son Konum Zamanı'),
+    ],
+    colWidths: [10, 24, 12, 12, 14, 22],
+    style: { head: [], border: ['gray'] },
+    wordWrap: true,
+  });
+
+  for (const vehicle of liveData.vehicles || []) {
+    table.push([
+      vehicle.vehicleDoorNo || '-',
+      vehicle.direction || '-',
+      String(vehicle.latitude ?? '-'),
+      String(vehicle.longitude ?? '-'),
+      vehicle.nearestStopCode || '-',
+      vehicle.lastLocationTime || '-',
+    ]);
+  }
+
+  return table.toString();
+}
