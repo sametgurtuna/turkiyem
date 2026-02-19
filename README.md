@@ -1,0 +1,129 @@
+# turkiyem
+
+Turkiye Toplu Tasima ve Deprem CLI araci.
+
+AFAD deprem verileri, EGO (Ankara) otobus saatleri ve IETT (Istanbul) GTFS hat bilgilerini terminalden sorgulayabilirsiniz.
+
+## Kurulum
+
+```bash
+npm install -g turkiyem
+```
+
+Veya yerel olarak:
+
+```bash
+git clone <repo-url>
+cd turkiyemCLI
+npm install
+npm link
+```
+
+## Gereksinimler
+
+- Node.js 20+
+
+## Kullanim
+
+### Banner ve Yardim
+
+```bash
+turkiyem
+turkiyem help
+```
+
+### Sehir Secimi
+
+Hat sorgulama icin once sehir secmelisiniz:
+
+```bash
+turkiyem sehir ankara
+turkiyem sehir istanbul
+```
+
+### Hat Sorgulama
+
+Secili sehre gore hat bilgilerini sorgular:
+
+```bash
+# Ankara (EGO)
+turkiyem sehir ankara
+turkiyem hat 340
+
+# Istanbul (IETT)
+turkiyem sehir istanbul
+turkiyem hat 34AS
+```
+
+Ankara icin EGO web sitesinden sefer saatleri cekilir.
+Istanbul icin IETT GTFS verilerinden hat bilgileri (durak sayisi, ilk/son durak) gosterilir.
+
+### Deprem Sorgulama
+
+AFAD API uzerinden gercek zamanli deprem verileri:
+
+```bash
+# Son 24 saat
+turkiyem deprem son24
+
+# Son 7 gun
+turkiyem deprem 7gun
+
+# Buyukluge gore filtrele (ornegin >= 4.0)
+turkiyem deprem buyukluk 4.0
+```
+
+Buyuklugu 4.0 ve ustu olan depremler kirmizi ile vurgulanir.
+
+### Temizleme
+
+Cache ve yapilandirmayi sifirlar:
+
+```bash
+turkiyem temizle
+```
+
+### Versiyon
+
+```bash
+turkiyem --version
+```
+
+## Yapilandirma
+
+Secili sehir `~/.turkiyem/config.json` dosyasinda saklanir. Bu dosya otomatik olusturulur.
+
+## Veri Kaynaklari
+
+| Kaynak | Aciklama |
+|--------|----------|
+| AFAD | Deprem verileri (deprem.afad.gov.tr) |
+| EGO | Ankara otobus sefer saatleri (ego.gov.tr) |
+| IETT | Istanbul GTFS hat verileri (data.ibb.gov.tr) |
+
+## npm Publish
+
+1. npm hesabiniza giris yapin:
+
+```bash
+npm login
+```
+
+2. package.json icindeki `name`, `version`, `author` alanlarini duzenleyin.
+
+3. Yayinlayin:
+
+```bash
+npm publish
+```
+
+4. Guncelleme icin versiyonu artirin:
+
+```bash
+npm version patch
+npm publish
+```
+
+## Lisans
+
+MIT

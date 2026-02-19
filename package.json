@@ -1,0 +1,45 @@
+{
+  "name": "turkiyem",
+  "version": "1.0.0",
+  "description": "Türkiye Toplu Taşıma ve Deprem CLI aracı - AFAD deprem verileri, EGO/IETT hat bilgileri",
+  "type": "module",
+  "main": "./src/index.js",
+  "bin": {
+    "turkiyem": "./src/index.js"
+  },
+  "scripts": {
+    "start": "node src/index.js",
+    "test": "echo \"No tests yet\""
+  },
+  "keywords": [
+    "turkiye",
+    "deprem",
+    "afad",
+    "iett",
+    "ego",
+    "toplu-tasima",
+    "cli",
+    "earthquake",
+    "transit"
+  ],
+  "author": "",
+  "license": "MIT",
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "dependencies": {
+    "axios": "^1.7.9",
+    "chalk": "^5.4.1",
+    "cheerio": "^1.0.0",
+    "cli-table3": "^0.6.5",
+    "commander": "^13.1.0",
+    "csv-parse": "^5.6.0",
+    "dotenv": "^16.4.7",
+    "node-cache": "^5.1.2",
+    "ora": "^8.2.0"
+  },
+  "files": [
+    "src/**/*",
+    "README.md"
+  ]
+}
