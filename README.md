@@ -3,6 +3,7 @@
 Turkiye Toplu Tasima ve Deprem CLI araci.
 
 AFAD deprem verileri, EGO (Ankara) otobus saatleri ve IETT (Istanbul) hat/saat bilgilerini terminalden sorgulayabilirsiniz.
+Open-Meteo ile API key gerektirmeden guncel hava, saatlik tahmin ve hava kalitesi sorgulayabilirsiniz.
 
 ## Kurulum
 
@@ -81,6 +82,30 @@ turkiyem deprem buyukluk 4.0
 
 Buyuklugu 4.0 ve ustu olan depremler kirmizi ile vurgulanir.
 
+### Hava Durumu ve Hava Kalitesi
+
+Open-Meteo uzerinden API key gerektirmeden sorgu yapar:
+
+```bash
+# Secili sehir icin guncel hava
+turkiyem hava guncel
+
+# Sehir bazli guncel hava
+turkiyem hava guncel istanbul
+
+# Koordinat bazli guncel hava
+turkiyem hava guncel 41.0082,28.9784
+
+# Saatlik tahmin (varsayilan 2 gun)
+turkiyem hava saatlik istanbul
+
+# Saatlik tahmin gun sayisi (1-7)
+turkiyem hava saatlik istanbul --gun 3
+
+# Hava kalitesi
+turkiyem hava kalite ankara
+```
+
 ### Temizleme
 
 Cache ve yapilandirmayi sifirlar:
@@ -107,6 +132,8 @@ Secili sehir `~/.turkiyem/config.json` dosyasinda saklanir. Bu dosya otomatik ol
 | EGO | Ankara otobus sefer saatleri (ego.gov.tr) |
 | IETT | Istanbul GTFS hat verileri (data.ibb.gov.tr) |
 | IETT SOAP | Planlanan sefer saatleri (api.ibb.gov.tr) |
+| Open-Meteo | Guncel hava ve saatlik tahmin (api.open-meteo.com) |
+| Open-Meteo AQ | Hava kalitesi (air-quality-api.open-meteo.com) |
 
 ## npm Publish
 

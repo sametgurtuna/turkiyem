@@ -7,6 +7,7 @@ import { printBanner, printHelp } from './utils/banner.js';
 import { sehirSec } from './commands/sehir.js';
 import { hatSorgula } from './commands/hat.js';
 import { depremSon24, deprem7Gun, depremBuyukluk } from './commands/deprem.js';
+import { havaGuncel, havaKalitesi, havaSaatlik } from './commands/hava.js';
 import { temizle } from './commands/temizle.js';
 
 const require = createRequire(import.meta.url);
@@ -68,6 +69,32 @@ depremCmd
   .description('Büyüklüğe göre filtrele (ör: 4.0)')
   .action(async (deger) => {
     await depremBuyukluk(deger);
+  });
+
+const havaCmd = program
+  .command('hava')
+  .description('Hava durumu ve hava kalitesi sorgula');
+
+havaCmd
+  .command('guncel [sehirVeyaKoordinat]')
+  .description('Güncel sıcaklık, rüzgar ve nem bilgisi')
+  .action(async (sehirVeyaKoordinat) => {
+    await havaGuncel(sehirVeyaKoordinat);
+  });
+
+havaCmd
+  .command('saatlik [sehirVeyaKoordinat]')
+  .description('Saatlik hava tahmini (varsayılan 2 gün)')
+  .option('-g, --gun <gun>', 'Tahmin gün sayısı (1-7)', '2')
+  .action(async (sehirVeyaKoordinat, options) => {
+    await havaSaatlik(sehirVeyaKoordinat, options.gun);
+  });
+
+havaCmd
+  .command('kalite [sehirVeyaKoordinat]')
+  .description('Güncel hava kalitesi (PM10, PM2.5, CO, NO2)')
+  .action(async (sehirVeyaKoordinat) => {
+    await havaKalitesi(sehirVeyaKoordinat);
   });
 
 program
