@@ -1,0 +1,13 @@
+node_modules/
+.env
+
+# Test / geçici dosyalar
+*.html
+*.cjs
+test.zip
+test_gtfs/
+error.log
+error_log.txt
+error_log_cmd.txt
+bursa-main.js
+izmir-test.js

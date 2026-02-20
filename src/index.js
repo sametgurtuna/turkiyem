@@ -6,6 +6,7 @@ import { createRequire } from 'node:module';
 import { printBanner, printHelp } from './utils/banner.js';
 import { sehirSec } from './commands/sehir.js';
 import { hatCanliSorgula, hatSorgula } from './commands/hat.js';
+import { durakSorgula } from './commands/durak.js';
 import { depremSon24, deprem7Gun, depremBuyukluk } from './commands/deprem.js';
 import { havaGuncel, havaKalitesi, havaSaatlik } from './commands/hava.js';
 import { temizle } from './commands/temizle.js';
@@ -54,6 +55,13 @@ hatCmd
       return;
     }
     await hatSorgula(arg1);
+  });
+
+program
+  .command('durak <stopId>')
+  .description('Durak bazlı detay sorgula (Adana, Antalya, Bursa, İzmir)')
+  .action(async (stopId) => {
+    await durakSorgula(stopId);
   });
 
 const depremCmd = program
@@ -130,7 +138,7 @@ program
   });
 
 if (process.argv.length <= 2) {
-  printHelp();
+  import('./commands/menu.js').then((m) => m.showMenu());
 } else {
   program.parse(process.argv);
 }

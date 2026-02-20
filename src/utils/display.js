@@ -1,5 +1,6 @@
 import Table from 'cli-table3';
 import chalk from 'chalk';
+import asciichart from 'asciichart';
 
 export function createEarthquakeTable(earthquakes) {
   const table = new Table({
@@ -167,6 +168,8 @@ export function createHourlyWeatherTable(result) {
     style: { head: [], border: ['gray'] },
   });
 
+  const temperatures = [];
+
   for (const row of result.rows || []) {
     table.push([
       row.time || '-',
@@ -174,9 +177,19 @@ export function createHourlyWeatherTable(result) {
       String(row.apparentTemperature ?? '-'),
       String(row.precipitationProbability ?? '-'),
     ]);
+
+    if (row.temperature !== undefined && row.temperature !== null) {
+      temperatures.push(row.temperature);
+    }
   }
 
-  return table.toString();
+  let chart = '';
+  if (temperatures.length > 0) {
+    chart = '\n' + chalk.white.bold('  Sıcaklık Grafiği (Sonraki Saatler)\n') +
+      chalk.cyan(asciichart.plot(temperatures, { height: 10 })) + '\n\n';
+  }
+
+  return chart + table.toString();
 }
 
 export function createAirQualityTable(result) {
@@ -268,6 +281,256 @@ export function createDovizTable(result) {
       c.alis || '-',
       c.satis || '-'
     ]);
+  }
+
+  return table.toString();
+}
+
+export function createAdanaBusInfoTable(info) {
+  const table = new Table({
+    style: { head: [], border: ['gray'] },
+  });
+
+  table.push(
+    { [chalk.cyan('Hat Adı')]: info.busName || '-' },
+    { [chalk.cyan('Son Güncelleme')]: info.lastUpdate || '-' }
+  );
+
+  return table.toString();
+}
+
+export function createAdanaScheduleTable(schedule) {
+  const table = new Table({
+    head: [chalk.white.bold('Sefer Saatleri')],
+    colWidths: [70],
+    style: { head: [], border: ['gray'] },
+    wordWrap: true,
+  });
+
+  if (schedule && schedule.length > 0) {
+    // formatTimes takes an array, let's just chunk it ourselves or use formatTimes
+    // Unfortunately formatTimes trims at "limit". Maybe just chunk by 10
+    const chunks = [];
+    for (let i = 0; i < schedule.length; i += 10) {
+      chunks.push(schedule.slice(i, i + 10).join(', '));
+    }
+    table.push([chunks.join('\n')]);
+  } else {
+    table.push(['-']);
+  }
+  return table.toString();
+}
+
+export function createAdanaStopsTable(stops) {
+  const table = new Table({
+    head: [
+      chalk.white.bold('Durak Adı'),
+      chalk.white.bold('Stop ID')
+    ],
+    colWidths: [45, 12],
+    style: { head: [], border: ['gray'] },
+    wordWrap: true,
+  });
+
+  for (const s of stops) {
+    table.push([s.name, s.id]);
+  }
+  return table.toString();
+}
+
+export function createAdanaStopDetailsTable(stop) {
+  const table = new Table({
+    style: { head: [], border: ['gray'] },
+  });
+
+  table.push(
+    { [chalk.cyan('Durak Adı')]: stop.stopName || '-' },
+    { [chalk.cyan('Stop ID')]: stop.stopId || '-' }
+  );
+
+  if (stop.passingBuses && stop.passingBuses.length > 0) {
+    table.push({ [chalk.cyan('Geçen Hatlar')]: stop.passingBuses.join('\n') });
+  } else {
+    table.push({ [chalk.cyan('Geçen Hatlar')]: '-' });
+  }
+
+  return table.toString();
+}
+
+export function createAntalyaScheduleTable(rows) {
+  const table = new Table({
+    head: [
+      chalk.white.bold('Sıra'),
+      chalk.white.bold('İlk Sefer Zamanı'),
+      chalk.white.bold('Durak Adı'),
+      chalk.white.bold('Durak No')
+    ],
+    colWidths: [6, 20, 45, 12],
+    style: { head: [], border: ['gray'] },
+    wordWrap: true,
+  });
+
+  rows.forEach((r, idx) => {
+    table.push([
+      (idx + 1).toString(),
+      r.saat,
+      r.durakAdi,
+      r.durakNo
+    ]);
+  });
+
+  return table.toString();
+}
+
+export function createAntalyaStopTable(rows, stopId) {
+  const table = new Table({
+    head: [
+      chalk.white.bold('Sıcak Saat'),
+      chalk.white.bold('Hat Adı'),
+      chalk.white.bold('Yön'),
+      chalk.white.bold('Güzergah')
+    ],
+    colWidths: [15, 10, 8, 45],
+    style: { head: [], border: ['gray'] },
+    wordWrap: true,
+  });
+
+  rows.forEach(r => {
+    table.push([
+      r.saat,
+      chalk.cyan(r.hatAdi),
+      r.yon,
+      r.guzergah
+    ]);
+  });
+
+  return table.toString();
+}
+
+export function createBursaRouteStopsTable(stops) {
+  const table = new Table({
+    head: [
+      chalk.white.bold('Sıra'),
+      chalk.white.bold('Durak Adı'),
+      chalk.white.bold('Durak ID')
+    ],
+    colWidths: [6, 45, 12],
+    style: { head: [], border: ['gray'] },
+    wordWrap: true,
+  });
+
+  stops.forEach((s) => {
+    table.push([
+      s.seq?.toString() || '-',
+      s.stnAd || '-',
+      s.stnID?.toString() || '-'
+    ]);
+  });
+
+  return table.toString();
+}
+
+export function createBursaLiveTrackingTable(liveData) {
+  const table = new Table({
+    head: [
+      chalk.white.bold('Plaka'),
+      chalk.white.bold('Hız (km/s)'),
+      chalk.white.bold('Doluluk (%)')
+    ],
+    colWidths: [15, 12, 12],
+    style: { head: [], border: ['gray'] },
+    wordWrap: true,
+  });
+
+  liveData.forEach((d) => {
+    table.push([
+      d.plaka || '-',
+      d.hiz?.toString() || '-',
+      d.doluluk?.toString() || '-'
+    ]);
+  });
+
+  return table.toString();
+}
+
+export function createBursaStationRemainingTable(remainingTimeData) {
+  const table = new Table({
+    head: [
+      chalk.white.bold('Hat Kodu'),
+      chalk.white.bold('Kalan Süre (Dk)'),
+      chalk.white.bold('Varış Saati'),
+      chalk.white.bold('Kalan Durak')
+    ],
+    colWidths: [12, 18, 15, 15],
+    style: { head: [], border: ['gray'] },
+    wordWrap: true,
+  });
+
+  remainingTimeData.forEach((d) => {
+    table.push([
+      chalk.cyan(d.hatKod || '-'),
+      d.kalanSure?.toString() || '-',
+      d.tahminiKalanSure || '-',
+      d.kalanDurak?.toString() || '-'
+    ]);
+  });
+
+  return table.toString();
+}
+
+export function createIzmirStopsTable(stops) {
+  const table = new Table({
+    head: [
+      chalk.white.bold('Sıra'),
+      chalk.white.bold('Durak Adı'),
+      chalk.white.bold('Durak ID')
+    ],
+    colWidths: [8, 45, 12],
+    style: { head: [], border: ['gray'] },
+    wordWrap: true,
+  });
+
+  for (const s of stops) {
+    table.push([s.seq?.toString() || '-', s.name || '-', s.id || '-']);
+  }
+
+  return table.toString();
+}
+
+export function createIzmirScheduleTable(schedule) {
+  const table = new Table({
+    head: [chalk.white.bold('Sefer Saatleri')],
+    colWidths: [70],
+    style: { head: [], border: ['gray'] },
+    wordWrap: true,
+  });
+
+  if (schedule && schedule.length > 0) {
+    const chunks = [];
+    for (let i = 0; i < schedule.length; i += 10) {
+      chunks.push(schedule.slice(i, i + 10).join(', '));
+    }
+    table.push([chunks.join('\n')]);
+  } else {
+    table.push(['-']);
+  }
+
+  return table.toString();
+}
+
+export function createIzmirStopScheduleTable(schedule) {
+  const table = new Table({
+    head: [
+      chalk.white.bold('Saat'),
+      chalk.white.bold('Hat')
+    ],
+    colWidths: [12, 60],
+    style: { head: [], border: ['gray'] },
+    wordWrap: true,
+  });
+
+  for (const s of schedule) {
+    table.push([s.time || '-', chalk.cyan(s.route || '-')]);
   }
 
   return table.toString();

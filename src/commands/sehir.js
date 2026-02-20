@@ -1,7 +1,7 @@
 import chalk from 'chalk';
 import { setCity, getCity } from '../utils/config.js';
 
-const SUPPORTED_CITIES = ['ankara', 'istanbul'];
+const SUPPORTED_CITIES = ['ankara', 'istanbul', 'adana', 'antalya', 'bursa', 'izmir'];
 
 export function sehirSec(city) {
   if (!city) {
@@ -15,6 +15,10 @@ export function sehirSec(city) {
     console.log(chalk.white('Kullanım:'));
     console.log(chalk.cyan('  turkiyem sehir ankara'));
     console.log(chalk.cyan('  turkiyem sehir istanbul'));
+    console.log(chalk.cyan('  turkiyem sehir adana'));
+    console.log(chalk.cyan('  turkiyem sehir antalya'));
+    console.log(chalk.cyan('  turkiyem sehir bursa'));
+    console.log(chalk.cyan('  turkiyem sehir izmir'));
     return;
   }
 

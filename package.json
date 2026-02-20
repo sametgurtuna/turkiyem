@@ -5,7 +5,7 @@
   "type": "module",
   "main": "./src/index.js",
   "bin": {
-    "turkiyem": "./src/index.js"
+    "turkiyem": "src/index.js"
   },
   "scripts": {
     "start": "node src/index.js",
@@ -32,15 +32,20 @@
     "node": ">=20.0.0"
   },
   "dependencies": {
+    "adm-zip": "^0.5.16",
+    "asciichart": "^1.5.25",
     "axios": "^1.7.9",
+    "boxen": "^8.0.1",
     "chalk": "^5.4.1",
     "cheerio": "^1.0.0",
     "cli-table3": "^0.6.5",
     "commander": "^13.1.0",
     "csv-parse": "^5.6.0",
     "dotenv": "^16.4.7",
+    "gradient-string": "^3.0.0",
     "node-cache": "^5.1.2",
-    "ora": "^8.2.0"
+    "ora": "^8.2.0",
+    "prompts": "^2.4.2"
   },
   "files": [
     "src/**/*",
