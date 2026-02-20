@@ -9,6 +9,7 @@ import { hatCanliSorgula, hatSorgula } from './commands/hat.js';
 import { depremSon24, deprem7Gun, depremBuyukluk } from './commands/deprem.js';
 import { havaGuncel, havaKalitesi, havaSaatlik } from './commands/hava.js';
 import { temizle } from './commands/temizle.js';
+import { dovizKurlari } from './commands/doviz.js';
 
 const require = createRequire(import.meta.url);
 const pkg = require('../package.json');
@@ -111,6 +112,14 @@ program
   .description('Cache ve yapılandırmayı temizle')
   .action(() => {
     temizle();
+  });
+
+program
+  .command('doviz')
+  .description('TCMB güncel döviz kurlarını sorgula')
+  .option('--tum', 'Tüm kurları göster')
+  .action(async (options) => {
+    await dovizKurlari(options);
   });
 
 program

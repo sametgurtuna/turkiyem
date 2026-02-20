@@ -37,6 +37,8 @@ Türkiye için modern, terminal tabanlı bir **toplu taşıma + deprem + hava du
   - API key gerektirmeden güncel hava
   - Saatlik tahmin (1-7 gün)
   - Hava kalitesi (PM10, PM2.5, CO, NO2)
+- **Ekonomi:**
+  - TCMB güncel döviz kurları listesi
 - **CLI UX:**
   - Komut bazlı spinner
   - Tablo tabanlı okunabilir terminal çıktısı
@@ -72,6 +74,7 @@ turkiyem sehir istanbul
 turkiyem hat 34AS
 turkiyem deprem son24
 turkiyem hava guncel
+turkiyem doviz
 ```
 
 ## Komut Referansı
@@ -146,6 +149,16 @@ turkiyem hava kalite izmir
 turkiyem hava guncel 41.0082,28.9784
 ```
 
+### Ekonomi (TCMB)
+
+```bash
+# Sık kullanılan kurlar (USD, EUR vb.)
+turkiyem doviz
+
+# Tüm kurlar listesi
+turkiyem doviz --tum
+```
+
 ## Veri Kaynakları
 
 | Kaynak | Kullanım |
@@ -157,6 +170,7 @@ turkiyem hava guncel 41.0082,28.9784
 | IETT SOAP (SeferGerceklesme) | İstanbul canlı araç konumu |
 | Open-Meteo Forecast | Güncel hava + saatlik tahmin |
 | Open-Meteo Air Quality | Hava kalitesi |
+| TCMB | Döviz kurları |
 
 ## Mimari ve Proje Yapısı
 

@@ -29,6 +29,7 @@ export function printHelp() {
   console.log(chalk.cyan('    turkiyem deprem son24') + chalk.gray('             Son 24 saat depremler'));
   console.log(chalk.cyan('    turkiyem deprem 7gun') + chalk.gray('              Son 7 gün depremler'));
   console.log(chalk.cyan('    turkiyem deprem buyukluk <deger>') + chalk.gray('  Büyüklüğe göre filtrele'));
+  console.log(chalk.cyan('    turkiyem doviz [--tum]') + chalk.gray('            TCMB Döviz kurları'));
   console.log(chalk.cyan('    turkiyem temizle') + chalk.gray('                  Cache ve config temizle'));
   console.log(chalk.cyan('    turkiyem --version') + chalk.gray('                Versiyon göster'));
   console.log('');
