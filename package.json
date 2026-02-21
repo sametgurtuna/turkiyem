@@ -37,7 +37,7 @@
     "axios": "^1.7.9",
     "boxen": "^8.0.1",
     "chalk": "^5.4.1",
-    "cheerio": "^1.0.0",
+    "cheerio": "^1.2.0",
     "cli-table3": "^0.6.5",
     "commander": "^13.1.0",
     "csv-parse": "^5.6.0",

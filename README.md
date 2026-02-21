@@ -12,7 +12,7 @@
 </p>
 
 <p align="center">
-  6 şehrin toplu taşıma verileri, AFAD deprem bilgileri, Open-Meteo hava durumu, TCMB döviz kurları — hepsi tek bir <code>npm</code> paketi içinde.
+  8 şehrin toplu taşıma verileri, AFAD deprem bilgileri, Open-Meteo hava durumu, TCMB döviz kurları — hepsi tek bir <code>npm</code> paketi içinde.
 </p>
 
 ---
@@ -69,6 +69,8 @@ Türkiye'de toplu taşıma verileri onlarca farklı belediye sitesi, API ve veri
 | **Antalya** | Antalya Büyükşehir Belediyesi | ✅ | ✅ | — | ✅ |
 | **Bursa** | Burulaş (Bursakart API) | ✅ | ✅ | ✅ | ✅ |
 | **İzmir** | ESHOT (GTFS Açık Veri) | ✅ | ✅ | — | ✅ |
+| **Trabzon** | Trabzon Büyükşehir Belediyesi | ✅ | — | — | ✅ |
+| **Samsun** | Samulaş | ✅ | ✅ | — | ✅ |
 
 > Yeni şehir entegrasyonları için [yol haritasına](#-yol-haritası) bakın.
 
@@ -76,7 +78,7 @@ Türkiye'de toplu taşıma verileri onlarca farklı belediye sitesi, API ve veri
 
 ## ✨ Özellikler
 
-### 🚌 Toplu Taşıma (6 Şehir)
+### 🚌 Toplu Taşıma (8 Şehir)
 - Hat numarası veya adıyla arama
 - Durak listesi ve sıralı güzergah görüntüleme
 - Sefer saatleri (gün tipi ve yöne göre)
@@ -213,6 +215,10 @@ turkiyem hat 17
 # İzmir (ESHOT GTFS) — Hat durakları + sefer saatleri
 turkiyem sehir izmir
 turkiyem hat 34
+
+# Trabzon — Hat bilgisi + kalkış ve dönüş yönlü sefer saatleri
+turkiyem sehir trabzon
+turkiyem hat 103
 ```
 
 > Birden fazla eşleşen hat varsa interaktif bir seçim menüsü sunulur.
@@ -307,6 +313,7 @@ turkiyem temizle         # Cache ve yapılandırmayı sıfırla
 | [Antalya Büyükşehir](https://www.antalya.bel.tr) | Hat / tarife | Antalya | Kamu verisi |
 | [Burulaş (Bursakart)](https://www.bursakart.com.tr) | Hat / durak / canlı konum | Bursa | Kamu API |
 | [ESHOT GTFS](https://acikveri.bizizmir.com) | Hat / durak / sefer saatleri | İzmir | İzmir Açık Veri Lisansı |
+| [Trabzon Büyükşehir](https://ulasim.trabzon.bel.tr) | Hat / sefer saatleri | Trabzon | Kamu verisi |
 | [Open-Meteo](https://open-meteo.com) | Hava durumu, hava kalitesi | Tüm dünya | CC BY 4.0 |
 | [TCMB](https://www.tcmb.gov.tr) | Döviz kurları | — | Kamu verisi |
 
@@ -320,7 +327,7 @@ turkiyem/
 │   ├── index.js                    # Commander.js giriş noktası
 │   ├── commands/
 │   │   ├── sehir.js                # Şehir seçim komutu
-│   │   ├── hat.js                  # Hat sorgulama (6 şehir)
+│   │   ├── hat.js                  # Hat sorgulama (7 şehir)
 │   │   ├── durak.js                # Durak sorgulama (4 şehir)
 │   │   ├── deprem.js               # AFAD deprem komutları
 │   │   ├── hava.js                 # Hava durumu komutları
@@ -334,6 +341,7 @@ turkiyem/
 │   │   ├── antalyaService.js       # Antalya belediye API
 │   │   ├── bursaService.js         # Bursa Burulaş API
 │   │   ├── izmirService.js         # İzmir ESHOT GTFS
+│   │   ├── trabzonService.js       # Trabzon belediyesi açık verisi
 │   │   ├── afadService.js          # AFAD deprem API
 │   │   ├── weatherService.js       # Open-Meteo API
 │   │   └── tcmbService.js          # TCMB döviz XML
@@ -464,7 +472,7 @@ Detaylı yol haritası için [`TODO.md`](./TODO.md) dosyasına bakın.
 | Konya GTFS Verileri | 📋 Planlandı |
 | Mersin Ulaşım Tarifeleri | 📋 Planlandı |
 | Samsun Otobüs Bilgileri | 📋 Planlandı |
-| Trabzon Ulaşım Bilgileri | 📋 Planlandı |
+| Trabzon Ulaşım Bilgileri | ✅ Tamamlandı |
 | İzmir Nöbetçi Eczane | 📋 Planlandı |
 | Kayseri Nöbetçi Eczane | 📋 Planlandı |
 | e-Nabız / e-Sağlık | 📋 Planlandı |

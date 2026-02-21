@@ -142,7 +142,9 @@ export async function showMenu() {
                             { title: 'Adana', value: 'adana' },
                             { title: 'Antalya', value: 'antalya' },
                             { title: 'Bursa', value: 'bursa' },
-                            { title: 'İzmir', value: 'izmir' }
+                            { title: 'İzmir', value: 'izmir' },
+                            { title: 'Trabzon', value: 'trabzon' },
+                            { title: 'Samsun', value: 'samsun' }
                         ]
                     });
                     if (sehir) sehirSec(sehir);

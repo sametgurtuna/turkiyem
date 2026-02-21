@@ -7,6 +7,9 @@ import { fetchAdanaBuses, fetchAdanaBusDetails } from '../services/adanaService.
 import { fetchAntalyaFormOptions, fetchAntalyaRouteSchedule } from '../services/antalyaService.js';
 import { searchBursaRouteAndStation, getBursaRouteStops, getBursaScheduleByStop, getBursaRealTimeLocation } from '../services/bursaService.js';
 import { searchIzmirRoutes, getIzmirRouteStopsAndSchedule } from '../services/izmirService.js';
+import { fetchTrabzonBuses, fetchTrabzonBusSchedule } from '../services/trabzonService.js';
+import { fetchSamsunBuses, fetchSamsunBusSchedule } from '../services/samsunService.js';
+import { fetchMersinRoutes, fetchMersinSchedule } from '../services/mersinService.js';
 import prompts from 'prompts';
 import {
   createEgoInfoTable,
@@ -23,6 +26,10 @@ import {
   createBursaLiveTrackingTable,
   createIzmirStopsTable,
   createIzmirScheduleTable,
+  createTrabzonScheduleTable,
+  createSamsunScheduleTable,
+  createSamsunStopsTable,
+  createMersinScheduleTable,
 } from '../utils/display.js';
 
 export async function hatSorgula(hatNo) {
@@ -52,8 +59,14 @@ export async function hatSorgula(hatNo) {
     await queryBursa(hatNo);
   } else if (city === 'izmir') {
     await queryIzmir(hatNo);
+  } else if (city === 'trabzon') {
+    await queryTrabzon(hatNo);
+  } else if (city === 'samsun') {
+    await querySamsun(hatNo);
+  } else if (city === 'mersin') {
+    await queryMersin(hatNo);
   } else {
-    console.log(chalk.red(`Desteklenmeyen şehir: ${city}. ankara, istanbul, adana, antalya, bursa veya izmir seçin.`));
+    console.log(chalk.red(`Desteklenmeyen şehir: ${city}. ankara, istanbul, adana, antalya, bursa, izmir, trabzon, samsun veya mersin seçin.`));
   }
 }
 
@@ -427,3 +440,185 @@ async function queryIzmir(hatNo) {
     console.log(chalk.red(err.message));
   }
 }
+
+async function queryTrabzon(hatNo) {
+  const spinner = ora(`Trabzon hat araması yapılıyor (${hatNo})...`).start();
+  try {
+    const listData = await fetchTrabzonBuses();
+    const query = hatNo.toUpperCase();
+    const matches = listData.filter(b => b.name.includes(query) || b.name === query);
+
+    if (matches.length === 0) {
+      spinner.fail(chalk.yellow(`"${hatNo}" aramasıyla eşleşen Trabzon otobüs hattı bulunamadı.`));
+      return;
+    }
+
+    spinner.stop();
+    let targetId = matches[0].id;
+    let selectedName = matches[0].name;
+
+    if (matches.length > 1) {
+      const response = await prompts({
+        type: 'select',
+        name: 'selectedTarget',
+        message: `Birden fazla hat bulundu. Hangisini görmek istersiniz?`,
+        choices: matches.map(m => ({ title: m.name, value: m.id }))
+      });
+      targetId = response.selectedTarget;
+      selectedName = matches.find(m => m.id === targetId)?.name;
+      if (!targetId) return;
+    }
+
+    spinner.start(`Hat detayları alınıyor (${selectedName})...`);
+    const details = await fetchTrabzonBusSchedule(targetId);
+    spinner.succeed(`Hat bilgileri alındı`);
+    console.log('');
+    console.log(chalk.white.bold(`  ${details.busName}`));
+
+    if (details.gidisSaat && details.gidisSaat.length > 0) {
+      console.log('');
+      console.log(chalk.cyan.bold(`  Yön: ${details.direction1}`));
+      console.log(createTrabzonScheduleTable(details.gidisSaat));
+    }
+
+    if (details.donusSaat && details.donusSaat.length > 0) {
+      console.log('');
+      console.log(chalk.cyan.bold(`  Yön: ${details.direction2}`));
+      console.log(createTrabzonScheduleTable(details.donusSaat));
+    }
+  } catch (err) {
+    if (spinner.isSpinning) spinner.fail(chalk.red('Trabzon ulaşım verisi alınamadı.'));
+    console.log(chalk.red(err.message));
+  }
+}
+
+async function querySamsun(hatNo) {
+  const spinner = ora('Samsun (Samulaş) hat bilgileri aranıyor...').start();
+  try {
+    const buses = await fetchSamsunBuses();
+
+    // Find matching buses
+    const normalizedHatNo = hatNo.toLowerCase().replace(/\s+/g, '');
+    let matched = buses.filter(b =>
+      b.name.toLowerCase().replace(/\s+/g, '').includes(normalizedHatNo) ||
+      b.id.toString() === normalizedHatNo
+    );
+
+    if (matched.length === 0) {
+      spinner.fail(`Samsun sisteminde "${hatNo}" aramasına uygun hat bulunamadı.`);
+      return;
+    }
+
+    spinner.stop();
+
+    let selectedLineNo;
+
+    if (matched.length === 1) {
+      selectedLineNo = matched[0].id;
+      console.log(chalk.green(`✔ Bulunan hat: ${chalk.bold(matched[0].name)}`));
+    } else {
+      console.log(chalk.yellow(`Birden fazla hat bulundu ("${hatNo}" için):`));
+
+      const choices = matched.map(b => ({
+        title: chalk.bold(b.name),
+        description: `ID: ${b.id}`,
+        value: b.id
+      }));
+
+      const response = await prompts({
+        type: 'select',
+        name: 'selectedBus',
+        message: 'Aşağıdaki ilgili hatlardan birini seçin:',
+        choices: choices
+      });
+
+      if (!response.selectedBus) {
+        console.log(chalk.red('Seçim yapılmadı.'));
+        return;
+      }
+
+      selectedLineNo = response.selectedBus;
+    }
+
+    spinner.start('Seçilen hattın saat ve durak bilgileri alınıyor...');
+
+    const details = await fetchSamsunBusSchedule(selectedLineNo);
+
+    spinner.succeed('Hat bilgileri alındı\n');
+
+    console.log(chalk.cyan.bold(`  ${details.busName} BİLGİLERİ\n`));
+
+    if (details.haftaIci.times.length > 0) {
+      console.log(chalk.magenta.bold(`  Hafta İçi: ${details.haftaIci.title}`));
+      console.log(createSamsunScheduleTable(details.haftaIci.times));
+    }
+    if (details.cumartesi.times.length > 0) {
+      console.log(chalk.magenta.bold(`  Cumartesi: ${details.cumartesi.title}`));
+      console.log(createSamsunScheduleTable(details.cumartesi.times));
+    }
+    if (details.pazar.times.length > 0) {
+      console.log(chalk.magenta.bold(`  Pazar: ${details.pazar.title}`));
+      console.log(createSamsunScheduleTable(details.pazar.times));
+    }
+
+    if (details.stops && details.stops.length > 0) {
+      console.log(chalk.blue.bold(`  Güzergah (Duraklar)`));
+      console.log(createSamsunStopsTable(details.stops));
+    } else {
+      console.log(chalk.yellow('  (Durak listesi bulunamadı)'));
+    }
+
+  } catch (error) {
+    if (spinner.isSpinning) spinner.fail('Bilgiler alınırken bir hata oluştu.');
+    console.log(chalk.red('Hata (Samsun): ' + error.message));
+  }
+}
+
+async function queryMersin(hatNo) {
+  const spinner = ora(`Mersin hat araması yapılıyor (${hatNo})...`).start();
+  try {
+    const matches = await fetchMersinRoutes(hatNo);
+
+    if (matches.length === 0) {
+      spinner.fail(chalk.yellow(`"${hatNo}" aramasıyla eşleşen Mersin otobüs hattı bulunamadı.`));
+      return;
+    }
+
+    spinner.stop();
+    let selectedRoute = matches[0];
+
+    if (matches.length > 1) {
+      const response = await prompts({
+        type: 'select',
+        name: 'route',
+        message: 'Birden fazla hat bulundu. Hangisini görmek istersiniz?',
+        choices: matches.map(m => ({
+          title: `${m.hatNo} - ${m.hatAdi} (${m.bolge})`,
+          value: m
+        }))
+      });
+      selectedRoute = response.route;
+      if (!selectedRoute) return;
+    }
+
+    spinner.start(`Sefer saatleri alınıyor (${selectedRoute.hatNo} - ${selectedRoute.hatAdi})...`);
+
+    const schedule = await fetchMersinSchedule(selectedRoute.hatNo);
+
+    spinner.succeed(`Mersin hat bilgileri alındı`);
+    console.log('');
+    console.log(chalk.white.bold(`  ${selectedRoute.hatNo} - ${selectedRoute.hatAdi} (${selectedRoute.bolge}) Hareket Saatleri`));
+
+    if (schedule.haftaIci.length > 0 || schedule.cumartesi.length > 0 || schedule.pazar.length > 0) {
+      console.log(createMersinScheduleTable(schedule));
+    } else {
+      console.log(chalk.yellow('  Sefer saati verisi bulunamadı.'));
+    }
+
+  } catch (err) {
+    if (spinner.isSpinning) spinner.fail('Mersin verisi alınamadı.');
+    console.log(chalk.red(err.message));
+  }
+}
+
+

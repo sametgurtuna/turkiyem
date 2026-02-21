@@ -535,3 +535,153 @@ export function createIzmirStopScheduleTable(schedule) {
 
   return table.toString();
 }
+
+export function createTrabzonScheduleTable(schedule) {
+  const table = new Table({
+    head: [
+      chalk.white.bold('Hafta İçi'),
+      chalk.white.bold('Cumartesi'),
+      chalk.white.bold('Pazar')
+    ],
+    colWidths: [20, 20, 20],
+    style: { head: [], border: ['gray'] },
+    wordWrap: true,
+  });
+
+  for (const row of schedule) {
+    table.push([
+      row.haftaIci || '-',
+      row.cumartesi || '-',
+      row.pazar || '-'
+    ]);
+  }
+
+  return table.toString();
+}
+
+export function createSamsunScheduleTable(times) {
+  const table = new Table({
+    head: [chalk.white.bold('Sefer Saatleri')],
+    colWidths: [70],
+    style: { head: [], border: ['gray'] },
+    wordWrap: true,
+  });
+
+  if (times && times.length > 0) {
+    const chunks = [];
+    for (let i = 0; i < times.length; i += 10) {
+      chunks.push(times.slice(i, i + 10).join(', '));
+    }
+    table.push([chunks.join('\n')]);
+  } else {
+    table.push(['-']);
+  }
+
+  return table.toString();
+}
+
+export function createSamsunStopsTable(stops) {
+  const table = new Table({
+    head: [chalk.white.bold('Durak Adı / Bilgisi')],
+    colWidths: [70],
+    style: { head: [], border: ['gray'] },
+    wordWrap: true,
+  });
+
+  for (const stop of stops) {
+    table.push([stop]);
+  }
+
+  return table.toString();
+}
+
+export function createMersinScheduleTable(schedule) {
+  const table = new Table({
+    head: [
+      chalk.white.bold('Hafta İçi'),
+      chalk.white.bold('Cumartesi'),
+      chalk.white.bold('Pazar')
+    ],
+    colWidths: [20, 20, 20],
+    style: { head: [], border: ['gray'] },
+    wordWrap: true,
+  });
+
+  const maxLen = Math.max(
+    schedule.haftaIci.length,
+    schedule.cumartesi.length,
+    schedule.pazar.length
+  );
+
+  for (let i = 0; i < maxLen; i++) {
+    table.push([
+      schedule.haftaIci[i] || '-',
+      schedule.cumartesi[i] || '-',
+      schedule.pazar[i] || '-'
+    ]);
+  }
+
+  return table.toString();
+}
+
+export function createNobetciEczaneTable(eczaneler) {
+  const table = new Table({
+    head: [
+      chalk.white.bold('İlçe'),
+      chalk.white.bold('Eczane Adı'),
+      chalk.white.bold('Telefon'),
+      chalk.white.bold('Adres'),
+      chalk.white.bold('Harita')
+    ],
+    colWidths: [12, 20, 14, 35, 30],
+    style: { head: [], border: ['gray'] },
+    wordWrap: true,
+  });
+
+  for (const ecz of eczaneler) {
+    let mapLink = '-';
+    if (ecz.LokasyonX && ecz.LokasyonY) {
+      mapLink = `https://www.google.com/maps/search/?api=1&query=${ecz.LokasyonX},${ecz.LokasyonY}`;
+    }
+    table.push([
+      ecz.Bolge || '-',
+      chalk.cyan(ecz.Adi || '-'),
+      ecz.Telefon || '-',
+      ecz.Adres || '-',
+      chalk.blue.underline(mapLink)
+    ]);
+  }
+
+  return table.toString();
+}
+
+export function createEczaneListTable(eczaneler) {
+  const table = new Table({
+    head: [
+      chalk.white.bold('İlçe'),
+      chalk.white.bold('Eczane Adı'),
+      chalk.white.bold('Telefon'),
+      chalk.white.bold('Adres'),
+      chalk.white.bold('Harita')
+    ],
+    colWidths: [12, 20, 14, 35, 30],
+    style: { head: [], border: ['gray'] },
+    wordWrap: true,
+  });
+
+  for (const ecz of eczaneler) {
+    let mapLink = '-';
+    if (ecz.LokasyonX && ecz.LokasyonY) {
+      mapLink = `https://www.google.com/maps/search/?api=1&query=${ecz.LokasyonX},${ecz.LokasyonY}`;
+    }
+    table.push([
+      ecz.Bolge || '-',
+      chalk.cyan(ecz.Adi || '-'),
+      ecz.Telefon || '-',
+      ecz.Adres || '-',
+      chalk.blue.underline(mapLink)
+    ]);
+  }
+
+  return table.toString();
+}

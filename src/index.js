@@ -11,6 +11,7 @@ import { depremSon24, deprem7Gun, depremBuyukluk } from './commands/deprem.js';
 import { havaGuncel, havaKalitesi, havaSaatlik } from './commands/hava.js';
 import { temizle } from './commands/temizle.js';
 import { dovizKurlari } from './commands/doviz.js';
+import { eczaneNobetci, eczaneAra } from './commands/eczane.js';
 
 const require = createRequire(import.meta.url);
 const pkg = require('../package.json');
@@ -113,6 +114,24 @@ havaCmd
   .description('Güncel hava kalitesi (PM10, PM2.5, CO, NO2)')
   .action(async (sehirVeyaKoordinat) => {
     await havaKalitesi(sehirVeyaKoordinat);
+  });
+
+const eczaneCmd = program
+  .command('eczane')
+  .description('Eczane işlemleri (İzmir ve Kayseri)');
+
+eczaneCmd
+  .command('nobetci [ilce]')
+  .description('Nöbetçi eczaneleri sorgula (İlçe filtreli)')
+  .action(async (ilce) => {
+    await eczaneNobetci(ilce);
+  });
+
+eczaneCmd
+  .command('ara [kelime]')
+  .description('Tüm eczanelerde kelime veya ilçeye göre arama yap')
+  .action(async (kelime) => {
+    await eczaneAra(kelime);
   });
 
 program

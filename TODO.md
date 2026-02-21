@@ -22,37 +22,37 @@
 - [ ] `turkiyem sehir konya` desteği ekle
 
 ### Mersin Ulaşım Tarifeleri
-- [ ] Mersin Büyükşehir Belediyesi ulaşım veri kaynağını araştır (API / web scraping)
-- [ ] `mersinService.js` servisi oluştur
-- [ ] Hat ve tarife sorgulama komutları ekle
-- [ ] `turkiyem sehir mersin` desteği ekle
+- [x] Mersin Büyükşehir Belediyesi ulaşım veri kaynağını araştır (API / web scraping)
+- [x] `mersinService.js` servisi oluştur
+- [x] Hat ve tarife sorgulama komutları ekle
+- [x] `turkiyem sehir mersin` desteği ekle
 
 ### Samsun Otobüs Bilgileri
-- [ ] Samsun Büyükşehir Belediyesi toplu taşıma veri kaynağını araştır
-- [ ] `samsunService.js` servisi oluştur
-- [ ] Hat ve durak bilgi sorgulama komutları ekle
-- [ ] `turkiyem sehir samsun` desteği ekle
+- [x] Samsun Büyükşehir Belediyesi toplu taşıma veri kaynağını araştır
+- [x] `samsunService.js` servisi oluştur
+- [x] Hat ve durak bilgi sorgulama komutları ekle
+- [x] `turkiyem sehir samsun` desteği ekle
 
 ### Trabzon Ulaşım Bilgileri
-- [ ] Trabzon Büyükşehir Belediyesi ulaşım veri kaynağını araştır
-- [ ] `trabzonService.js` servisi oluştur
-- [ ] Hat ve sefer bilgisi sorgulama komutları ekle
-- [ ] `turkiyem sehir trabzon` desteği ekle
+- [x] Trabzon Büyükşehir Belediyesi ulaşım veri kaynağını araştır
+- [x] `trabzonService.js` servisi oluştur
+- [x] Hat ve sefer bilgisi sorgulama komutları ekle
+- [x] `turkiyem sehir trabzon` desteği ekle
 
 ---
 
 ## 💊 Sağlık Modülleri
 
 ### İzmir Nöbetçi Eczane
-- [ ] İzmir Eczacı Odası veya İBB açık veri kaynağını araştır
-- [ ] `eczaneService.js` servisi oluştur (şehir parametreli)
-- [ ] Bölge / ilçe bazlı nöbetçi eczane listesi komutu ekle
-- [ ] `turkiyem eczane` komutu ekle (seçili şehre göre)
+- [x] İzmir Eczacı Odası veya İBB açık veri kaynağını araştır
+- [x] `eczaneService.js` servisi oluştur (şehir parametreli)
+- [x] Bölge / ilçe bazlı nöbetçi eczane listesi komutu ekle
+- [x] `turkiyem eczane` komutu ekle (seçili şehre göre)
 
 ### Kayseri Nöbetçi Eczane
-- [ ] Kayseri Eczacı Odası veya belediye veri kaynağını araştır
-- [ ] `eczaneService.js` içine Kayseri desteği ekle
-- [ ] İlçe bazlı nöbetçi eczane listesi komutu ekle
+- [x] Kayseri Eczacı Odası veya belediye veri kaynağını araştır
+- [x] `eczaneService.js` içine Kayseri desteği ekle
+- [x] İlçe bazlı nöbetçi eczane listesi komutu ekle
 
 ### e-Nabız / e-Sağlık Entegrasyonu
 - [ ] e-Nabız API erişim yollarını araştır (resmi API, token mekanizması)
