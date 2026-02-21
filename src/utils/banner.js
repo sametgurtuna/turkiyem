@@ -24,7 +24,7 @@ export function printBanner() {
 export function printHelp() {
   printBanner();
   console.log(chalk.white.bold('  Komutlar:\n'));
-  console.log(chalk.cyan('    turkiyem sehir <ankara|istanbul|adana|antalya|bursa|izmir|trabzon|samsun>') + chalk.gray('\n                                              Şehir seç'));
+  console.log(chalk.cyan('    turkiyem sehir <ankara|istanbul|adana|antalya|bursa|izmir|trabzon|samsun|mersin|kayseri>') + chalk.gray('\n                                              Şehir seç'));
   console.log(chalk.cyan('    turkiyem hat <numara>') + chalk.gray('             Hat sorgula'));
   console.log(chalk.cyan('    turkiyem hat canli <numara> [--detay]') + chalk.gray('  Canlı araç konumu (IETT)'));
   console.log(chalk.cyan('    turkiyem durak <id>') + chalk.gray('               Durak bazlı detay sorgula'));
@@ -34,8 +34,8 @@ export function printHelp() {
   console.log(chalk.cyan('    turkiyem deprem son24') + chalk.gray('             Son 24 saatteki depremler'));
   console.log(chalk.cyan('    turkiyem deprem 7gun') + chalk.gray('              Son 7 gündeki depremler'));
   console.log(chalk.cyan('    turkiyem deprem buyukluk <deger>') + chalk.gray('  Büyüklüğe göre deprem filtrele'));
-  console.log(chalk.cyan('    turkiyem eczane nobetci [ilce]') + chalk.gray('    Nöbetçi eczaneleri sorgula'));
-  console.log(chalk.cyan('    turkiyem eczane ara <kelime>') + chalk.gray('      Eczane adına veya ilçeye göre ara'));
+  console.log(chalk.cyan('    turkiyem eczane nobetci [ilce]') + chalk.gray('    Nöbetçi eczaneleri sorgula (Sadece İzmir ve Kayseri)'));
+  console.log(chalk.cyan('    turkiyem eczane ara <kelime>') + chalk.gray('      Eczane adına veya ilçeye göre ara (Sadece İzmir ve Kayseri)'));
   console.log(chalk.cyan('    turkiyem doviz [--tum]') + chalk.gray('            TCMB güncel döviz kurları'));
   console.log(chalk.cyan('    turkiyem temizle') + chalk.gray('                  Cache ve ayarları temizle'));
   console.log(chalk.cyan('    turkiyem --version') + chalk.gray('                Versiyonu göster'));

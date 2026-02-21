@@ -18,7 +18,7 @@ const commands = [
 ];
 
 const subcommands = {
-    'sehir': ['ankara', 'istanbul', 'adana', 'antalya', 'bursa', 'izmir', 'trabzon', 'samsun'],
+    'sehir': ['ankara', 'istanbul', 'adana', 'antalya', 'bursa', 'izmir', 'trabzon', 'samsun', 'mersin', 'kayseri'],
     'hat': ['canli'],
     'hava': ['guncel', 'saatlik', 'kalite'],
     'deprem': ['son24', '7gun', 'buyukluk'],
