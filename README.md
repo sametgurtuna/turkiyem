@@ -12,7 +12,7 @@
 </p>
 
 <p align="center">
-  8 şehrin toplu taşıma verileri, AFAD deprem bilgileri, Open-Meteo hava durumu, TCMB döviz kurları — hepsi tek bir <code>npm</code> paketi içinde.
+  9 şehrin toplu taşıma verileri, güncel nöbetçi eczaneler, AFAD deprem bilgileri, Open-Meteo hava durumu, TCMB döviz kurları — hepsi tek bir <code>npm</code> paketi içinde.
 </p>
 
 ---
@@ -52,6 +52,7 @@ Türkiye'de toplu taşıma verileri onlarca farklı belediye sitesi, API ve veri
 
 - 🔎 Tarayıcı açmadan **hat ve durak sorgulama**
 - 📍 Terminal üzerinden **canlı araç takibi** (İstanbul, Bursa)
+- 💊 Anlık **nöbetçi eczane** sorgulama seçenekleri
 - 🌍 **Deprem bildirimleri** renkli uyarılarla
 - ⛅ **Hava durumu** ve **hava kalitesi** API key gerektirmeden
 - 💱 **TCMB döviz kurları** tek komutla
@@ -71,6 +72,8 @@ Türkiye'de toplu taşıma verileri onlarca farklı belediye sitesi, API ve veri
 | **İzmir** | ESHOT (GTFS Açık Veri) | ✅ | ✅ | — | ✅ |
 | **Trabzon** | Trabzon Büyükşehir Belediyesi | ✅ | — | — | ✅ |
 | **Samsun** | Samulaş | ✅ | ✅ | — | ✅ |
+| **Mersin** | Mersin Büyükşehir Belediyesi | ✅ | — | — | ✅ |
+| **Kayseri** | Sadece Nöbetçi Eczane | — | — | — | — |
 
 > Yeni şehir entegrasyonları için [yol haritasına](#-yol-haritası) bakın.
 
@@ -78,12 +81,17 @@ Türkiye'de toplu taşıma verileri onlarca farklı belediye sitesi, API ve veri
 
 ## ✨ Özellikler
 
-### 🚌 Toplu Taşıma (8 Şehir)
+### 🚌 Toplu Taşıma (9 Şehir)
 - Hat numarası veya adıyla arama
 - Durak listesi ve sıralı güzergah görüntüleme
 - Sefer saatleri (gün tipi ve yöne göre)
 - Durak bazlı geçen hat ve zaman sorgulama
 - Birden fazla sonuçta interaktif seçim menüsü
+
+### 💊 Sağlık & Nöbetçi Eczane
+- **İzmir** ve **Kayseri** için nöbetçi eczane sorgulama
+- İzmir genel eczane arama ve lokasyon bilgisi
+- Telefon numarası ve harita bağlantısı gösterimi
 
 ### 📍 Canlı Araç Takibi
 - **İstanbul (IETT):** Anlık araç konumu, yön, yakın durak bilgisi
@@ -185,6 +193,9 @@ turkiyem sehir adana          # Şehri Adana olarak ayarla
 turkiyem sehir antalya        # Şehri Antalya olarak ayarla
 turkiyem sehir bursa          # Şehri Bursa olarak ayarla
 turkiyem sehir izmir          # Şehri İzmir olarak ayarla
+turkiyem sehir samsun         # Şehri Samsun olarak ayarla
+turkiyem sehir mersin         # Şehri Mersin olarak ayarla
+turkiyem sehir kayseri        # Şehri Kayseri olarak ayarla
 ```
 
 > 💡 `hat` ve `durak` komutları her zaman seçili şehre göre çalışır.
@@ -219,9 +230,25 @@ turkiyem hat 34
 # Trabzon — Hat bilgisi + kalkış ve dönüş yönlü sefer saatleri
 turkiyem sehir trabzon
 turkiyem hat 103
+
+# Samsun (Samulaş) — Hat bilgisi + duraklar + kalkış saatleri
+turkiyem sehir samsun
+turkiyem hat E1
+
+# Mersin — Hat bilgisi + kalkış saatleri
+turkiyem sehir mersin
+turkiyem hat 11M  # veya 'merkez' yazarak hat seçimi yapabilirsiniz
 ```
 
 > Birden fazla eşleşen hat varsa interaktif bir seçim menüsü sunulur.
+
+### Sağlık & Nöbetçi Eczane (İzmir / Kayseri)
+
+```bash
+turkiyem eczane nobetci          # Seçili şehirdeki tüm nöbetçi eczaneleri listeler
+turkiyem eczane nobetci bornova  # Seçili şehirde "bornova" ilçesi için arar
+turkiyem eczane ara yusuf        # İzmir'de adı/adresi "yusuf" olan tüm eczaneleri getirir
+```
 
 ### Durak Sorgulama
 
@@ -314,6 +341,10 @@ turkiyem temizle         # Cache ve yapılandırmayı sıfırla
 | [Burulaş (Bursakart)](https://www.bursakart.com.tr) | Hat / durak / canlı konum | Bursa | Kamu API |
 | [ESHOT GTFS](https://acikveri.bizizmir.com) | Hat / durak / sefer saatleri | İzmir | İzmir Açık Veri Lisansı |
 | [Trabzon Büyükşehir](https://ulasim.trabzon.bel.tr) | Hat / sefer saatleri | Trabzon | Kamu verisi |
+| [Samulaş](https://samulas.com.tr) | Hat / durak / sefer saatleri | Samsun | Kamu verisi |
+| [Mersin Büyükşehir](https://ulasim.mersin.bel.tr) | Hat / sefer saatleri | Mersin | Kamu API |
+| [İzmir BB Açık Veri](https://acikveri.bizizmir.com) | Eczane Bilgileri | İzmir | İzmir Açık Veri Lisansı |
+| [Kayseri BB Açık Veri](https://acikveri.kayseri.bel.tr) | Nöbetçi Eczaneler | Kayseri | Kamu API |
 | [Open-Meteo](https://open-meteo.com) | Hava durumu, hava kalitesi | Tüm dünya | CC BY 4.0 |
 | [TCMB](https://www.tcmb.gov.tr) | Döviz kurları | — | Kamu verisi |
 
@@ -470,11 +501,11 @@ Detaylı yol haritası için [`TODO.md`](./TODO.md) dosyasına bakın.
 |---------|-------|
 | Kocaeli GTFS Verileri | 📋 Planlandı |
 | Konya GTFS Verileri | 📋 Planlandı |
-| Mersin Ulaşım Tarifeleri | 📋 Planlandı |
-| Samsun Otobüs Bilgileri | 📋 Planlandı |
+| Mersin Ulaşım Tarifeleri | ✅ Tamamlandı |
+| Samsun Otobüs Bilgileri | ✅ Tamamlandı |
 | Trabzon Ulaşım Bilgileri | ✅ Tamamlandı |
-| İzmir Nöbetçi Eczane | 📋 Planlandı |
-| Kayseri Nöbetçi Eczane | 📋 Planlandı |
+| İzmir Nöbetçi Eczane | ✅ Tamamlandı |
+| Kayseri Nöbetçi Eczane | ✅ Tamamlandı |
 | e-Nabız / e-Sağlık | 📋 Planlandı |
 
 ---
