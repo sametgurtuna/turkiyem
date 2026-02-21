@@ -1,6 +1,6 @@
 {
   "name": "turkiyem",
-  "version": "1.9.0",
+  "version": "1.10.0",
   "description": "Türkiye Toplu Taşıma ve Deprem CLI aracı - AFAD deprem verileri, EGO hat saatleri ve IETT SOAP/GTFS bilgileri",
   "type": "module",
   "main": "./src/index.js",
