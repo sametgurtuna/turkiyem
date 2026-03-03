@@ -8,6 +8,9 @@ const PLANNED_TIME_SOAP_ACTION = 'http://tempuri.org/GetPlanlananSeferSaati_json
 const LIVE_SOAP_URL = 'https://api.ibb.gov.tr/iett/FiloDurum/SeferGerceklesme.asmx';
 const LIVE_SOAP_ACTION = 'http://tempuri.org/GetHatOtoKonum_json';
 
+const HAT_DURAK_GUZERGAH_URL = 'https://api.ibb.gov.tr/iett/UlasimAnaVeri/HatDurakGuzergah.asmx';
+const IBB_CRM_URL = 'https://api.ibb.gov.tr/iett/ibb/ibb.asmx';
+
 const RESOURCE_IDS = {
   routes: '46dbe388-c8c2-45c4-ac72-c06953de56a2',
   trips: '7ff49bdd-b0d2-4a6e-9392-b598f77f5070',
@@ -452,4 +455,142 @@ export async function fetchIettLiveVehicles(routeCode) {
     }
     throw err;
   }
+}
+
+// ─── Yeni IBB SOAP API Fonksiyonları ─────────────────────────────────
+
+function buildGenericSoapBody(method, params = {}) {
+  const paramXml = Object.entries(params)
+    .map(([key, value]) => `      <${key}>${value}</${key}>`)
+    .join('\n');
+
+  return `<?xml version="1.0" encoding="utf-8"?>
+<soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+               xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+               xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+  <soap:Body>
+    <${method} xmlns="http://tempuri.org/">
+${paramXml}
+    </${method}>
+  </soap:Body>
+</soap:Envelope>`;
+}
+
+function extractGenericSoapJson(xmlText, method) {
+  const tag = `${method}Result`;
+  const regex = new RegExp(`<${tag}>([\\s\\S]*?)<\\/${tag}>`, 'i');
+  const match = xmlText.match(regex);
+
+  if (!match || !match[1]) return [];
+  const jsonText = match[1].trim();
+  if (!jsonText || jsonText === '[]') return [];
+
+  return JSON.parse(jsonText);
+}
+
+async function callSoapEndpoint(url, method, params = {}, cacheKey, cacheTtl) {
+  const cached = getCached(cacheKey);
+  if (cached) return cached;
+
+  const body = buildGenericSoapBody(method, params);
+  const soapAction = `http://tempuri.org/${method}`;
+
+  try {
+    const response = await axios.post(url, body, {
+      timeout: 20000,
+      headers: {
+        'Content-Type': 'text/xml; charset=utf-8',
+        SOAPAction: soapAction,
+        ...API_HEADERS,
+      },
+      responseType: 'text',
+      maxRedirects: 5,
+      validateStatus: (status) => status >= 200 && status < 600,
+    });
+
+    if (response.status === 403) {
+      throw new Error(`IBB SOAP servisi erişimi engellendi (403). Metot: ${method}`);
+    }
+    if (response.status >= 500) {
+      throw new Error(`IBB SOAP servisi şu anda erişilemiyor (HTTP ${response.status}). Metot: ${method}`);
+    }
+    if (response.status !== 200) {
+      throw new Error(`IBB SOAP servisi HTTP ${response.status} döndürdü. Metot: ${method}`);
+    }
+
+    const parsed = extractGenericSoapJson(response.data, method);
+    setCached(cacheKey, parsed, cacheTtl || CACHE_TTL.DEFAULT);
+    return parsed;
+  } catch (err) {
+    if (err.code === 'ECONNABORTED') {
+      throw new Error(`IBB SOAP servisi zaman aşımına uğradı. Metot: ${method}`);
+    }
+    if (err.code === 'ENOTFOUND' || err.code === 'ECONNREFUSED') {
+      throw new Error(`IBB SOAP servisine bağlanılamadı. Metot: ${method}`);
+    }
+    if (err instanceof SyntaxError) {
+      throw new Error(`IBB SOAP yanıtı çözümlenemedi. Metot: ${method}`);
+    }
+    throw err;
+  }
+}
+
+/**
+ * Tüm IETT hatlarını getirir (GetHat_json).
+ * Opsiyonel HatKodu parametresiyle belirli bir hat filtrelenebilir.
+ */
+export async function fetchIettAllRoutes(hatKodu) {
+  const params = hatKodu ? { HatKodu: hatKodu.toUpperCase() } : {};
+  const cacheKey = `ibb_hatlar_${hatKodu || 'all'}`;
+  return callSoapEndpoint(HAT_DURAK_GUZERGAH_URL, 'GetHat_json', params, cacheKey, CACHE_TTL.DEFAULT);
+}
+
+/**
+ * Tüm IETT duraklarını getirir (GetDurak_json).
+ * Opsiyonel DurakKodu parametresiyle belirli bir durak filtrelenebilir.
+ */
+export async function fetchIettAllStops(durakKodu) {
+  const params = durakKodu ? { DurakKodu: durakKodu } : {};
+  const cacheKey = `ibb_duraklar_${durakKodu || 'all'}`;
+  return callSoapEndpoint(HAT_DURAK_GUZERGAH_URL, 'GetDurak_json', params, cacheKey, CACHE_TTL.DEFAULT);
+}
+
+/**
+ * IETT garaj bilgilerini getirir (GetGaraj_json).
+ */
+export async function fetchIettGarages() {
+  return callSoapEndpoint(HAT_DURAK_GUZERGAH_URL, 'GetGaraj_json', {}, 'ibb_garajlar', CACHE_TTL.DEFAULT);
+}
+
+/**
+ * Tüm IETT filo araç konumlarını getirir (GetFiloAracKonum_json).
+ * Parametresiz çağrılır.
+ */
+export async function fetchIettFleetPositions() {
+  return callSoapEndpoint(LIVE_SOAP_URL, 'GetFiloAracKonum_json', {}, 'ibb_filo_konum', CACHE_TTL.IETT_LIVE);
+}
+
+/**
+ * IETT kaza lokasyonlarını getirir (GetKazaLokasyon_json).
+ */
+export async function fetchIettAccidentLocations() {
+  return callSoapEndpoint(LIVE_SOAP_URL, 'GetKazaLokasyon_json', {}, 'ibb_kaza_lokasyon', CACHE_TTL.IETT_LIVE);
+}
+
+/**
+ * IBB CRM – Hat bilgisi getirir (HatServisi_GYY).
+ */
+export async function fetchIettCrmHat(hatKodu) {
+  const params = hatKodu ? { hat_kodu: hatKodu.toUpperCase() } : {};
+  const cacheKey = `ibb_crm_hat_${hatKodu || 'all'}`;
+  return callSoapEndpoint(IBB_CRM_URL, 'HatServisi_GYY', params, cacheKey, CACHE_TTL.DEFAULT);
+}
+
+/**
+ * IBB CRM – Durak detay bilgisi getirir (DurakDetay_GYY).
+ */
+export async function fetchIettCrmDurak(hatKodu) {
+  const params = hatKodu ? { hat_kodu: hatKodu.toUpperCase() } : {};
+  const cacheKey = `ibb_crm_durak_${hatKodu || 'all'}`;
+  return callSoapEndpoint(IBB_CRM_URL, 'DurakDetay_GYY', params, cacheKey, CACHE_TTL.DEFAULT);
 }

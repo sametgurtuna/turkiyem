@@ -37,6 +37,16 @@ export function printHelp() {
   console.log(chalk.cyan('    turkiyem eczane nobetci [ilce]') + chalk.gray('    Nöbetçi eczaneleri sorgula (Sadece İzmir ve Kayseri)'));
   console.log(chalk.cyan('    turkiyem eczane ara <kelime>') + chalk.gray('      Eczane adına veya ilçeye göre ara (Sadece İzmir ve Kayseri)'));
   console.log(chalk.cyan('    turkiyem doviz [--tum]') + chalk.gray('            TCMB güncel döviz kurları'));
+  console.log(chalk.cyan('    turkiyem ibb hatlar [arama]') + chalk.gray('       İBB/IETT hat listesi sorgula'));
+  console.log(chalk.cyan('    turkiyem ibb duraklar [arama]') + chalk.gray('    İBB/IETT durak listesi sorgula'));
+  console.log(chalk.cyan('    turkiyem ibb filo') + chalk.gray('                 IETT filo araç konumları'));
+  console.log(chalk.cyan('    turkiyem ibb garaj') + chalk.gray('                IETT garaj bilgileri'));
+  console.log(chalk.cyan('    turkiyem ibb kaza') + chalk.gray('                 Güncel kaza lokasyonları'));
+  console.log(chalk.cyan('    turkiyem izsu kesinti') + chalk.gray('             İZSU güncel su kesintileri'));
+  console.log(chalk.cyan('    turkiyem izsu baraj') + chalk.gray('               İZSU baraj ve kuyu durumları'));
+  console.log(chalk.cyan('    turkiyem izsu uretim [-g] [-y]') + chalk.gray('    İZSU günlük/yıllık su üretimi dağılımı'));
+  console.log(chalk.cyan('    turkiyem izsu sube [-v]') + chalk.gray('           İZSU şube ve vezneleri'));
+  console.log(chalk.cyan('    turkiyem izsu analiz [-h|-c|-b]') + chalk.gray('   İZSU su analiz raporları'));
   console.log(chalk.cyan('    turkiyem temizle') + chalk.gray('                  Cache ve ayarları temizle'));
   console.log(chalk.cyan('    turkiyem --version') + chalk.gray('                Versiyonu göster'));
   console.log('');

@@ -5,6 +5,15 @@
 
 ---
 
+## 🚇 İstanbul (İBB/IETT) Ekstra Veriler — Tamamlandı
+- [x] IBB.asmx üzerinden hat listeleri
+- [x] IBB.asmx üzerinden durak listeleri 
+- [x] SeferGerceklesme.asmx üzerinden filo araç konumları
+- [x] HatDurakGuzergah.asmx üzerinden garaj bilgileri
+- [x] Canlı kaza lokasyonları takibi
+
+---
+
 ## 🚍 Yeni Şehir Entegrasyonları — Toplu Taşıma
 
 ### Kocaeli GTFS Verileri

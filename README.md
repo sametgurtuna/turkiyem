@@ -65,7 +65,7 @@ Türkiye'de toplu taşıma verileri onlarca farklı belediye sitesi, API ve veri
 | Şehir | Kaynak | Hat | Durak | Canlı Konum | Sefer Saatleri |
 |-------|--------|:---:|:-----:|:-----------:|:--------------:|
 | **Ankara** | EGO Genel Müdürlüğü | ✅ | — | — | ✅ |
-| **İstanbul** | IETT (GTFS + SOAP) | ✅ | — | ✅ | ✅ |
+| **İstanbul** | IETT (GTFS + SOAP) | ✅ | ✅ | ✅ | ✅ |
 | **Adana** | Adana Büyükşehir Belediyesi | ✅ | ✅ | — | ✅ |
 | **Antalya** | Antalya Büyükşehir Belediyesi | ✅ | ✅ | — | ✅ |
 | **Bursa** | Burulaş (Bursakart API) | ✅ | ✅ | ✅ | ✅ |
@@ -93,8 +93,8 @@ Türkiye'de toplu taşıma verileri onlarca farklı belediye sitesi, API ve veri
 - İzmir genel eczane arama ve lokasyon bilgisi
 - Telefon numarası ve harita bağlantısı gösterimi
 
-### 📍 Canlı Araç Takibi
-- **İstanbul (IETT):** Anlık araç konumu, yön, yakın durak bilgisi
+### 📍 Canlı Araç Takibi ve Ekstra Veriler
+- **İstanbul (IETT):** Anlık araç konumu, yön, yakın durak bilgisi. İBB/IETT'nin tüm hat listeleri, durak listeleri, mevcut garajları, canlı kaza lokasyonları ve anlık donanım verileri.
 - **Bursa (Burulaş):** Plaka, hız, doluluk oranı gösterimi
 
 ### 🌍 Deprem Bilgileri (AFAD)
@@ -270,6 +270,18 @@ turkiyem sehir izmir
 turkiyem durak konak
 ```
 
+### İBB/IETT Özel Sorguları
+
+```bash
+turkiyem ibb hatlar              # Tüm IETT hatlarını listeler
+turkiyem ibb hatlar 34           # "34" içeren hatları listeler
+turkiyem ibb duraklar            # Tüm IETT duraklarını listeler
+turkiyem ibb duraklar 10001      # "10001" koduyla eşleşen durakları bulur
+turkiyem ibb filo                # Sahadaki tüm araçların konum ve hız bilgisi
+turkiyem ibb garaj               # Garaj adları ve koordinat bilgileri
+turkiyem ibb kaza                # Güncel kaza lokasyonlarını göster
+```
+
 ### Canlı Konum
 
 ```bash
@@ -364,6 +376,7 @@ turkiyem/
 │   │   ├── hava.js                 # Hava durumu komutları
 │   │   ├── doviz.js                # TCMB döviz komutu
 │   │   ├── menu.js                 # İnteraktif menü sistemi
+│   │   ├── ibb.js                  # IBB/IETT genel servisleri
 │   │   └── temizle.js              # Cache temizleme
 │   ├── services/
 │   │   ├── egoService.js           # Ankara EGO API

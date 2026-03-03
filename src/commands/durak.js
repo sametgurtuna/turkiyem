@@ -15,17 +15,20 @@ export async function durakSorgula(stopId) {
     }
 
     const city = getCity();
-    if (city === 'adana') {
-        await queryAdanaStop(stopId);
-    } else if (city === 'antalya') {
-        await queryAntalyaStop(stopId);
-    } else if (city === 'bursa') {
-        await queryBursaStop(stopId);
-    } else if (city === 'izmir') {
-        await queryIzmirStop(stopId);
+    const cityHandlers = {
+        adana: queryAdanaStop,
+        antalya: queryAntalyaStop,
+        bursa: queryBursaStop,
+        izmir: queryIzmirStop
+    };
+
+    const handler = cityHandlers[city];
+    if (handler) {
+        await handler(stopId);
     } else {
-        console.log(chalk.yellow('Durak sorgulaması şu an sadece Adana, Antalya, Bursa ve İzmir için destekleniyor.'));
-        console.log(chalk.cyan('Şehri değiştirmek için: turkiyem sehir adana | antalya | bursa | izmir'));
+        const supported = Object.keys(cityHandlers).join(' | ');
+        console.log(chalk.yellow(`Durak sorgulaması şu an sadece Adana, Antalya, Bursa ve İzmir için destekleniyor.`));
+        console.log(chalk.cyan(`Şehri değiştirmek için: turkiyem sehir ${supported}`));
         return;
     }
 }

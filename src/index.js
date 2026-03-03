@@ -12,6 +12,8 @@ import { havaGuncel, havaKalitesi, havaSaatlik } from './commands/hava.js';
 import { temizle } from './commands/temizle.js';
 import { dovizKurlari } from './commands/doviz.js';
 import { eczaneNobetci, eczaneAra } from './commands/eczane.js';
+import { ibbHatlar, ibbDuraklar, ibbFilo, ibbGaraj, ibbKaza } from './commands/ibb.js';
+import { registerIzsuCommands } from './commands/izsu.js';
 
 const require = createRequire(import.meta.url);
 const pkg = require('../package.json');
@@ -90,6 +92,7 @@ depremCmd
     await depremBuyukluk(deger);
   });
 
+registerIzsuCommands(program);
 const havaCmd = program
   .command('hava')
   .description('Hava durumu ve hava kalitesi sorgula');
@@ -147,6 +150,45 @@ program
   .option('--tum', 'Tüm kurları göster')
   .action(async (options) => {
     await dovizKurlari(options);
+  });
+
+const ibbCmd = program
+  .command('ibb')
+  .description('İBB/IETT veri sorguları (hat listesi, durak, filo, garaj, kaza)');
+
+ibbCmd
+  .command('hatlar [arama]')
+  .description('IETT hat listesi sorgula veya filtrele')
+  .action(async (arama) => {
+    await ibbHatlar(arama);
+  });
+
+ibbCmd
+  .command('duraklar [arama]')
+  .description('IETT durak listesi sorgula veya ara')
+  .action(async (arama) => {
+    await ibbDuraklar(arama);
+  });
+
+ibbCmd
+  .command('filo')
+  .description('IETT filo araç konumlarını göster')
+  .action(async () => {
+    await ibbFilo();
+  });
+
+ibbCmd
+  .command('garaj')
+  .description('IETT garaj bilgilerini göster')
+  .action(async () => {
+    await ibbGaraj();
+  });
+
+ibbCmd
+  .command('kaza')
+  .description('Güncel kaza lokasyonlarını göster')
+  .action(async () => {
+    await ibbKaza();
   });
 
 program

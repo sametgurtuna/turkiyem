@@ -14,7 +14,7 @@ function printSessionHeader() {
 }
 
 const commands = [
-    'sehir', 'hat', 'durak', 'hava', 'deprem', 'eczane', 'doviz', 'temizle', 'help', 'clear', 'exit', 'çıkış'
+    'sehir', 'hat', 'durak', 'hava', 'deprem', 'eczane', 'doviz', 'ibb', 'temizle', 'help', 'clear', 'exit', 'çıkış'
 ];
 
 const subcommands = {
@@ -22,7 +22,8 @@ const subcommands = {
     'hat': ['canli'],
     'hava': ['guncel', 'saatlik', 'kalite'],
     'deprem': ['son24', '7gun', 'buyukluk'],
-    'eczane': ['nobetci', 'ara']
+    'eczane': ['nobetci', 'ara'],
+    'ibb': ['hatlar', 'duraklar', 'filo', 'garaj', 'kaza']
 };
 
 function completer(line) {

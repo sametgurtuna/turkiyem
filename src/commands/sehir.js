@@ -13,16 +13,9 @@ export function sehirSec(city) {
     }
     console.log('');
     console.log(chalk.white('Kullanım:'));
-    console.log(chalk.cyan('  turkiyem sehir ankara'));
-    console.log(chalk.cyan('  turkiyem sehir istanbul'));
-    console.log(chalk.cyan('  turkiyem sehir adana'));
-    console.log(chalk.cyan('  turkiyem sehir antalya'));
-    console.log(chalk.cyan('  turkiyem sehir bursa'));
-    console.log(chalk.cyan('  turkiyem sehir izmir'));
-    console.log(chalk.cyan('  turkiyem sehir trabzon'));
-    console.log(chalk.cyan('  turkiyem sehir samsun'));
-    console.log(chalk.cyan('  turkiyem sehir mersin'));
-    console.log(chalk.cyan('  turkiyem sehir kayseri'));
+    SUPPORTED_CITIES.forEach((c) => {
+      console.log(chalk.cyan(`  turkiyem sehir ${c}`));
+    });
     return;
   }
 

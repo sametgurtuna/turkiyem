@@ -1,7 +1,7 @@
 import chalk from 'chalk';
-import ora from 'ora';
 import prompts from 'prompts';
 import boxen from 'boxen';
+import { withSpinner } from '../utils/spinnerWrapper.js';
 import { fetchEarthquakes, fetchByMagnitude } from '../services/afadService.js';
 import { createEarthquakeTable } from '../utils/display.js';
 
@@ -42,41 +42,35 @@ async function displayPaginatedEarthquakes(earthquakes) {
 }
 
 export async function depremSon24() {
-  const spinner = ora('AFAD verileri alınıyor (son 24 saat)...').start();
+  const earthquakes = await withSpinner(
+    'AFAD verileri alınıyor (son 24 saat)...',
+    () => fetchEarthquakes('son24')
+  );
 
-  try {
-    const earthquakes = await fetchEarthquakes('son24');
-
-    if (!earthquakes || earthquakes.length === 0) {
-      spinner.info('Son 24 saatte kayıtlı deprem bulunamadı.');
-      return;
-    }
-
-    spinner.succeed(`${earthquakes.length} deprem bulundu (son 24 saat)`);
-    console.log('');
-    await displayPaginatedEarthquakes(earthquakes);
-  } catch (err) {
-    spinner.fail(boxen(chalk.red(err.message), { padding: 1, borderColor: 'red' }));
+  if (!earthquakes) return; // fail message already printed by wrapper
+  if (earthquakes.length === 0) {
+    console.log(chalk.yellow('Son 24 saatte kayıtlı deprem bulunamadı.'));
+    return;
   }
+
+  console.log(chalk.green(`✔ ${earthquakes.length} deprem bulundu (son 24 saat)\n`));
+  await displayPaginatedEarthquakes(earthquakes);
 }
 
 export async function deprem7Gun() {
-  const spinner = ora('AFAD verileri alınıyor (son 7 gün)...').start();
+  const earthquakes = await withSpinner(
+    'AFAD verileri alınıyor (son 7 gün)...',
+    () => fetchEarthquakes('7gun')
+  );
 
-  try {
-    const earthquakes = await fetchEarthquakes('7gun');
-
-    if (!earthquakes || earthquakes.length === 0) {
-      spinner.info('Son 7 günde kayıtlı deprem bulunamadı.');
-      return;
-    }
-
-    spinner.succeed(`${earthquakes.length} deprem bulundu (son 7 gün)`);
-    console.log('');
-    await displayPaginatedEarthquakes(earthquakes);
-  } catch (err) {
-    spinner.fail(boxen(chalk.red(err.message), { padding: 1, borderColor: 'red' }));
+  if (!earthquakes) return;
+  if (earthquakes.length === 0) {
+    console.log(chalk.yellow('Son 7 günde kayıtlı deprem bulunamadı.'));
+    return;
   }
+
+  console.log(chalk.green(`✔ ${earthquakes.length} deprem bulundu (son 7 gün)\n`));
+  await displayPaginatedEarthquakes(earthquakes);
 }
 
 export async function depremBuyukluk(value) {
@@ -86,20 +80,17 @@ export async function depremBuyukluk(value) {
     return;
   }
 
-  const spinner = ora(`Büyüklüğü >= ${min} olan depremler aranıyor...`).start();
+  const earthquakes = await withSpinner(
+    `Büyüklüğü >= ${min} olan depremler aranıyor...`,
+    () => fetchByMagnitude(min)
+  );
 
-  try {
-    const earthquakes = await fetchByMagnitude(min);
-
-    if (!earthquakes || earthquakes.length === 0) {
-      spinner.info(`Büyüklüğü >= ${min} olan deprem bulunamadı (son 7 gün).`);
-      return;
-    }
-
-    spinner.succeed(`${earthquakes.length} deprem bulundu (büyüklük >= ${min})`);
-    console.log('');
-    await displayPaginatedEarthquakes(earthquakes);
-  } catch (err) {
-    spinner.fail(boxen(chalk.red(err.message), { padding: 1, borderColor: 'red' }));
+  if (!earthquakes) return;
+  if (earthquakes.length === 0) {
+    console.log(chalk.yellow(`Büyüklüğü >= ${min} olan deprem bulunamadı (son 7 gün).`));
+    return;
   }
+
+  console.log(chalk.green(`✔ ${earthquakes.length} deprem bulundu (büyüklük >= ${min})\n`));
+  await displayPaginatedEarthquakes(earthquakes);
 }

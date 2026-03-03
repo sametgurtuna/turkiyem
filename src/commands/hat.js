@@ -47,26 +47,24 @@ export async function hatSorgula(hatNo) {
     return;
   }
 
-  if (city === 'ankara') {
-    await queryEgo(hatNo);
-  } else if (city === 'istanbul') {
-    await queryIett(hatNo);
-  } else if (city === 'adana') {
-    await queryAdana(hatNo);
-  } else if (city === 'antalya') {
-    await queryAntalya(hatNo);
-  } else if (city === 'bursa') {
-    await queryBursa(hatNo);
-  } else if (city === 'izmir') {
-    await queryIzmir(hatNo);
-  } else if (city === 'trabzon') {
-    await queryTrabzon(hatNo);
-  } else if (city === 'samsun') {
-    await querySamsun(hatNo);
-  } else if (city === 'mersin') {
-    await queryMersin(hatNo);
+  const handlers = {
+    ankara: queryEgo,
+    istanbul: queryIett,
+    adana: queryAdana,
+    antalya: queryAntalya,
+    bursa: queryBursa,
+    izmir: queryIzmir,
+    trabzon: queryTrabzon,
+    samsun: querySamsun,
+    mersin: queryMersin
+  };
+
+  const handler = handlers[city];
+  if (handler) {
+    await handler(hatNo);
   } else {
-    console.log(chalk.red(`Desteklenmeyen şehir: ${city}. ankara, istanbul, adana, antalya, bursa, izmir, trabzon, samsun veya mersin seçin.`));
+    const supportedList = Object.keys(handlers).join(', ');
+    console.log(chalk.red(`Desteklenmeyen şehir: ${city}. Lütfen şu şehirlerden birini seçin: ${supportedList}.`));
   }
 }
 
